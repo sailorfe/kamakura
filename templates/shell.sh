@@ -1,0 +1,20 @@
+#!/bin/sh
+export THEME_NAME=kamakura
+export COLOR_BACKGROUND={{base}} 
+export COLOR_FOREGROUND={{text}} 
+export COLOR_BLACK={{overlay}}
+export COLOR_RED={{accent01}}
+export COLOR_GREEN={{accent02}}
+export COLOR_YELLOW={{accent03}}
+export COLOR_BLUE={{accent04}}
+export COLOR_MAGENTA={{accent05}}
+export COLOR_CYAN={{accent06}}
+export COLOR_WHITE={{text}}
+export COLOR_BRIGHT_BLACK={{high}}
+export COLOR_BRIGHT_RED={{bright01}}
+export COLOR_BRIGHT_GREEN={{bright02}}
+export COLOR_BRIGHT_YELLOW={{bright03}}
+export COLOR_BRIGHT_BLUE={{bright04}}
+export COLOR_BRIGHT_MAGENTA={{bright05}}
+export COLOR_BRIGHT_CYAN={{bright06}}
+export COLOR_BRIGHT_WHITE={{light}}

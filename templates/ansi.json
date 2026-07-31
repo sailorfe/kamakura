@@ -1,0 +1,20 @@
+{
+    "background": "{{base}}",
+    "foreground": "{{text}}",
+    "black": "{{overlay}}",
+    "red": "{{accent01}}",
+    "green": "{{accent02}}",
+    "yellow": "{{accent03}}",
+    "blue": "{{accent04}}",
+    "magenta": "{{accent05}}",
+    "cyan": "{{accent06}}",
+    "white": "{{text}}",
+    "brightBlack": "{{high}}",
+    "brightRed": "{{bright01}}",
+    "brightGreen": "{{bright02}}",
+    "brightYellow": "{{bright03}}",
+    "brightBlue": "{{bright04}}",
+    "brightMagenta": "{{bright05}}",
+    "brightCyan": "{{bright06}}",
+    "brightWhite": "{{light}}"
+}

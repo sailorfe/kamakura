@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+emacs --batch -l kamakura-theme.el -f kamakura/export-all

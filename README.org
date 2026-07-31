@@ -1,0 +1,23 @@
+* kamakura
+
+a light emacs theme inspired by /the elusive samurai 逃げ上手の若君/ [[https://www.youtube.com/watch?v=Dgj69Vqr120][season 2 opening]].
+
+** extras
+
+- [[https://codeberg.org/dnkl/foot][foot]]
+- [[https://neovim.io][nvim]] 0.11
+- shell
+- [[https://termux.dev][termux]]
+- tty
+- vim 8 ([[https://vim-classic.org][vim-classic]])
+
+external ports are automatically generated from templates using ~{{ variable }}~ placeholders for keys that can be found in [[file:palette.json][palette.json]]. to contribute:
+
+1. add a file to ~templates/~.
+2. edit ~kamakura/export-targets~ at the bottom of [[file:kamakura-theme.el][kamakura-theme.el]] to include a list like ~("templates/INPUT-FILE" . "extras/$APP/OUTPUT-FILE").~
+3. run [[file:scripts/build][./scripts/build]] and [[file:scripts/test][./scripts/test]]. test your build directly in the target application and repeat as needed.
+4. make a pull request committing your *template file*, *kamakura-theme.el* and *your new extra* with a commit message like ~feat(extra): add $APP~.
+
+** license
+
+kamakura is released with [[https://unlicense.org][the unlicense]].
