@@ -1,12 +1,12 @@
-" accent04.vim -- generated from accent04-theme.el, do not edit by hand.
+" kamakura.vim -- generated from kamakura-theme.el, do not edit by hand.
 " Classic Vimscript (no vim9script)
 
-set background=dark
+set background=light
 hi clear
 if exists('syntax_on')
   syntax reset
 endif
-let g:colors_name = 'accent04'
+let g:colors_name = 'kamakura'
 
 if exists('+termguicolors')
   set termguicolors
@@ -29,7 +29,7 @@ hi SignColumn   guifg={{faint}} ctermbg={{faint-cterm}} guibg={{overlay}} ctermb
 hi FoldColumn   guifg={{high}} guibg={{low}} ctermfg={{high-cterm}} ctermbg={{low-cterm}}
 hi Folded       guifg={{faint}} ctermfg={{faint-cterm}} guibg={{overlay}} ctermbg={{overlay-cterm}}
 hi Conceal      guifg={{muted}} ctermbg={{muted-cterm}} guibg={{surface}} ctermbg={{surface-cterm}}
-hi Visual       guibg={{accent06}} guifg={{base}} ctermbg={{accent06-cterm}} ctermfg={{base-cterm}}
+hi Visual       guibg={{accent05}} guifg={{base}} ctermbg={{accent05-cterm}} ctermfg={{base-cterm}}
 hi Search       guifg={{base}} guibg={{accent03}} ctermfg={{base-cterm}} ctermbg={{accent03-cterm}}
 hi IncSearch    guifg={{base}} guibg={{accent04}} ctermfg={{base-cterm}} ctermbg={{accent04-cterm}}
 hi QuickFixLine guibg={{overlay}} ctermbg={{overlay-cterm}}
@@ -68,7 +68,7 @@ hi Special      guifg={{accent04}} ctermfg={{accent04-cterm}}
 hi Underlined   guifg={{accent04}} gui=underline ctermfg={{accent04-cterm}} cterm=underline
 hi Title        guifg={{accent06}} gui=bold cterm=bold term=bold ctermfg={{accent06-cterm}}
 hi Todo         guifg={{base}} guibg={{accent03}} ctermfg={{base-cterm}} ctermbg={{accent03-cterm}}
-hi Error        guifg={{light}} guibg={{accent01}} ctermfg={{light-cterm}} ctermbg={{accent01-cterm}}
+hi Error        guibg={{accent01}} ctermfg={{base-cterm}} ctermbg={{accent01-cterm}} cterm=bold
 
 " == diff =========================
 

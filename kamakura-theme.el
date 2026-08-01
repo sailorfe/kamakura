@@ -77,16 +77,16 @@ Defaults to +0.1 lightness and no saturation change."
          ;; accents
          (accent01 (kamakura/hsl 352 0.76 0.38)) ; miko skirt
          (accent02 (kamakura/hsl 114 0.50 0.36)) ; yorishige
-         (accent03 (kamakura/hsl 44 0.75 0.52)) ; mima
+         (accent03 (kamakura/hsl 44 0.75 0.46)) ; mima
          (accent04 (kamakura/hsl 263 0.33 0.61)); tokiyuki
          (accent05 (kamakura/hsl 355 0.63 0.65)) ; ayako
          (accent06 (kamakura/hsl 186 0.53 0.35)) ; shizuku
 
          (bright01 (kamakura/bright 352 0.76 0.38 0.15 -0.2))
          (bright02 (kamakura/bright 114 0.50 0.36 0.15 -0.15))
-         (bright03 (kamakura/bright 44 0.75 0.52 0.15))
+         (bright03 (kamakura/bright 44 0.75 0.46 0.1))
          (bright04 (kamakura/bright 263 0.33 0.61 0.1))
-         (bright05 (kamakura/bright 355 0.63 0.65 0.15))
+         (bright05 (kamakura/bright 355 0.63 0.65 0.1))
          (bright06 (kamakura/bright 186 0.53 0.35 0.15 -0.2))
 
          (raw
@@ -119,7 +119,7 @@ Defaults to +0.1 lightness and no saturation change."
                             (kamakura/nearest-256 (cdr p))))
                     raw))))
 
-(deftheme kamakura "Kamakura theme.")
+(deftheme kamakura "Nanbokuchou theme.")
 
 (let* ((base (alist-get 'base kamakura/palette))
        (surface (alist-get 'surface kamakura/palette))

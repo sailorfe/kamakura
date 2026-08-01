@@ -1,0 +1,20 @@
+#!/bin/sh
+export THEME_NAME=kamakura
+export COLOR_BACKGROUND=#f9f3e0 
+export COLOR_FOREGROUND=#5d4c3b 
+export COLOR_BLACK=#f9e6c2
+export COLOR_RED=#aa172a
+export COLOR_GREEN=#37892d
+export COLOR_YELLOW=#cd9e1d
+export COLOR_BLUE=#937abc
+export COLOR_MAGENTA=#dd6d76
+export COLOR_CYAN=#297f88
+export COLOR_WHITE=#5d4c3b
+export COLOR_BRIGHT_BLACK=#d7c697
+export COLOR_BRIGHT_RED=#ca4455
+export COLOR_BRIGHT_GREEN=#5fad56
+export COLOR_BRIGHT_YELLOW=#e2b63a
+export COLOR_BRIGHT_BLUE=#af9ccd
+export COLOR_BRIGHT_MAGENTA=#e7979d
+export COLOR_BRIGHT_CYAN=#55a1a9
+export COLOR_BRIGHT_WHITE=#413324
