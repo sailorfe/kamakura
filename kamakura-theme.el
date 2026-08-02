@@ -59,19 +59,19 @@ Defaults to +0.1 lightness and no saturation change."
 (defvar kamakura/palette
   (let* (
          ;; backgrounds
-         (base    (kamakura/hsl 45 0.71 0.93))
+         (base (kamakura/hsl 45 0.71 0.93))
          (surface (kamakura/hsl 46 0.76 0.90))
          (overlay (kamakura/hsl 40 0.82 0.87))
 
          ;; foregrounds
-         (muted   (kamakura/hsl 35 0.16 0.48))
-         (faint   (kamakura/hsl 35 0.12 0.60))
-         (text    (kamakura/hsl 30 0.22 0.30))
-         (light   (kamakura/hsl 30 0.28 0.20))
+         (muted (kamakura/hsl 35 0.16 0.48))
+         (faint (kamakura/hsl 35 0.12 0.60))
+         (text (kamakura/hsl 30 0.22 0.30))
+         (light (kamakura/hsl 30 0.28 0.20))
 
          ;; contrast
-         (low  (kamakura/hsl 44 0.30 0.90))
-         (med  (kamakura/hsl 39 0.25 0.82))
+         (low (kamakura/hsl 44 0.30 0.90))
+         (med (kamakura/hsl 39 0.25 0.82))
          (high (kamakura/hsl 44 0.45 0.72))
 
          ;; accents
@@ -82,6 +82,7 @@ Defaults to +0.1 lightness and no saturation change."
          (ayako (kamakura/hsl 355 0.63 0.65)) ; pink
          (shizuku (kamakura/hsl 186 0.53 0.35)) ; turquoise
 
+         ;; brights - only used in terminals
          (taisha (kamakura/bright 352 0.76 0.38 0.15 -0.2))
          (suwa (kamakura/bright 114 0.50 0.36 0.15 -0.15))
          (sasaki (kamakura/bright 44 0.75 0.46 0.1))
@@ -193,13 +194,13 @@ Defaults to +0.1 lightness and no saturation change."
    `(tab-bar-tab ((t (:background ,overlay :foreground ,ayako :weight bold))))
    `(tab-bar-tab-inactive ((t (:background ,surface :foreground ,muted))))
 
-   ;; --- line numbers ----------------------------------------------
+   ;; --- line numbers -------------------------------------------------
    `(line-number ((t (:foreground ,muted :background ,base))))
    `(line-number-current-line ((t (:foreground ,text :background ,overlay :weight bold))))
    `(line-number-major-tick ((t (:foreground ,faint :background ,base))))
    `(line-number-minor-tick ((t (:foreground ,muted :background ,base))))
 
-   ;; --- search / isearch --------------------------------------------
+   ;; --- search / isearch ---------------------------------------------
    `(isearch ((t (:background ,mima :foreground ,base))))
    `(isearch-fail ((t (:background ,miko :foreground ,light))))
    `(isearch-group-1 ((t (:background ,tokiyuki :foreground ,base))))
@@ -207,13 +208,12 @@ Defaults to +0.1 lightness and no saturation change."
    `(lazy-highlight ((t (:background ,med :foreground ,mima))))
    `(query-replace ((t (:background ,mima :foreground ,base))))
 
-   ;; --- show-paren --------------------------------------------------
+   ;; --- show-paren ---------------------------------------------------
    `(show-paren-match ((t (:background ,high :weight bold))))
    `(show-paren-match-expression ((t (:background ,overlay))))
    `(show-paren-mismatch ((t (:background ,miko :foreground ,light :weight bold))))
 
-   ;; --- misc syntax ----------------------------------------------
-   ;; sh
+   ;; --- sh ------------------------------------------------------------
    `(sh-heredoc ((t (:foreground ,mima :weight bold))))
    `(sh-quoted-exec ((t :foreground ,miko :slant italic)))
    `(sh-escaped-newline ((t :foreground ,faint)))
@@ -280,22 +280,17 @@ Defaults to +0.1 lightness and no saturation change."
    `(diff-indicator-removed ((t (:foreground ,miko))))
    `(diff-indicator-changed ((t (:foreground ,ayako))))
 
-   ;; --- diff-hl ----------------------------------------------------
-   `(diff-hl-insert ((t (:foreground ,yorishige))))
-   `(diff-hl-delete ((t (:foreground ,miko))))
-   `(diff-hl-change ((t (:foreground ,ayako))))
-
-   ;; --- flyspell ---------------------------------------------------
+   ;; --- flyspell -----------------------------------------------------
    `(flyspell-incorrect ((t (:foreground ,miko :underline (:style wave)))))
    `(flyspell-duplicate ((t (:foreground ,mima :underline (:style wave)))))
 
-   ;; --- completions (in-buffer / *Completions*) ---------------------
+   ;; --- completions ----------------------------------------------------
    `(completions-common-part ((t (:foreground ,ayako :weight bold))))
    `(completions-first-difference ((t (:foreground ,shizuku :weight bold))))
    `(completions-annotations ((t (:foreground ,muted :slant italic))))
    `(completions-group-title ((t (:foreground ,faint :weight bold))))
 
-   ;; --- widgets / custom-mode ----------------------------------------
+   ;; --- widgets / custom-mode --------------------------------------------
    `(widget-field ((t (:background ,overlay :foreground ,text :box (:line-width 1 :color ,muted)))))
    `(widget-single-line-field ((t (:background ,overlay :foreground ,text))))
    `(widget-button ((t (:foreground ,ayako :weight bold))))
@@ -307,7 +302,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(custom-variable-tag ((t (:foreground ,ayako :weight bold))))
    `(custom-group-tag ((t (:foreground ,tokiyuki :weight bold))))
 
-   ;; --- misc buffer / dired -----------------------------------------
+   ;; --- misc buffer / dired ---------------------------------------------
    `(match ((t (:background ,med :foreground ,mima))))
    `(next-error ((t (:background ,overlay))))
    `(help-key-binding ((t (:foreground ,ayako :background ,surface :box (:line-width 1 :color ,muted)))))
@@ -324,33 +319,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(dired-set-id ((t (:foreground ,shizuku :weight bold))))
    `(dired-special ((t (:foreground ,yorishige))))
 
-   ;; --- diredfl --------------------------------------------------------
-   `(diredfl-dir-heading ((t (:foreground ,ayako :weight bold))))
-   `(diredfl-dir-name ((t (:foreground ,tokiyuki))))
-   `(diredfl-dir-priv ((t (:foreground ,tokiyuki))))
-   `(diredfl-file-name ((t (:foreground ,text))))
-   `(diredfl-file-suffix ((t (:foreground ,faint))))
-   `(diredfl-symlink ((t (:foreground ,shizuku))))
-   `(diredfl-number ((t (:foreground ,mima))))
-   `(diredfl-date-time ((t (:foreground ,faint))))
-   `(diredfl-deletion ((t (:foreground ,miko :weight bold))))
-   `(diredfl-deletion-file-name ((t (:foreground ,miko :strike-through t))))
-   `(diredfl-flag-mark ((t (:foreground ,ayako :weight bold :background ,overlay))))
-   `(diredfl-flag-mark-line ((t (:background ,overlay))))
-   `(diredfl-ignored-file-name ((t (:foreground ,muted))))
-   `(diredfl-compressed-file-suffix ((t (:foreground ,shizuku))))
-   `(diredfl-compressed-file-name ((t (:foreground ,text))))
-   `(diredfl-executable-flag ((t (:foreground ,yorishige :weight bold))))
-   `(diredfl-read-priv ((t (:foreground ,mima))))
-   `(diredfl-write-priv ((t (:foreground ,mima))))
-   `(diredfl-exec-priv ((t (:foreground ,yorishige))))
-   `(diredfl-no-priv ((t (:foreground ,muted))))
-   `(diredfl-rare-priv ((t (:foreground ,shizuku :weight bold))))
-   `(diredfl-link-priv ((t (:foreground ,shizuku))))
-   `(diredfl-autofile-name ((t (:foreground ,faint :slant italic))))
-   `(diredfl-tagged-autofile-name ((t (:foreground ,ayako :slant italic))))
-
-   ;; --- flymake --------------------------------------------------------
+   ;; --- flymake -------------------------------------------------------
    `(flymake-error ((t (:underline (:style wave :color ,miko)))))
    `(flymake-warning ((t (:underline (:style wave :color ,mima)))))
    `(flymake-note ((t (:underline (:style wave :color ,tokiyuki)))))
@@ -358,47 +327,10 @@ Defaults to +0.1 lightness and no saturation change."
    `(flymake-warning-echo ((t (:foreground ,mima))))
    `(flymake-note-echo ((t (:foreground ,tokiyuki))))
 
-   ;; --- flycheck -------------------------------------------------------
-   `(flycheck-error ((t (:underline (:style wave :color ,miko)))))
-   `(flycheck-warning ((t (:underline (:style wave :color ,mima)))))
-   `(flycheck-info ((t (:underline (:style wave :color ,tokiyuki)))))
-   `(flycheck-fringe-error ((t (:foreground ,miko :weight bold))))
-   `(flycheck-fringe-warning ((t (:foreground ,mima :weight bold))))
-   `(flycheck-fringe-info ((t (:foreground ,tokiyuki :weight bold))))
-   `(flycheck-error-list-error ((t (:foreground ,miko :weight bold))))
-   `(flycheck-error-list-warning ((t (:foreground ,mima :weight bold))))
-   `(flycheck-error-list-info ((t (:foreground ,tokiyuki))))
-
-   ;; --- jinkx monsoon ---------------------------------------------------
-   `(jinx-misspelled ((t (:foreground ,miko :underline (:style wave :color ,miko)))))
-   `(jinx-highlight ((t (:foreground ,base :background ,mima))))
-
-   ;; --- eldoc / help hints & tooltips -----------------------------------
+   ;; --- eldoc -----------------------------------------------------------
    `(eldoc-highlight-function-argument ((t (:foreground ,ayako :weight bold))))
-   `(eldoc-box-body ((t (:background ,surface :foreground ,text))))
-   `(eldoc-box-border ((t (:background ,muted))))
 
-   ;; --- markdown-mode -------------------------------------------------
-   `(markdown-header-face ((t (:foreground ,ayako :weight bold))))
-   `(markdown-header-face-1 ((t (:foreground ,ayako :weight bold))))
-   `(markdown-header-face-2 ((t (:foreground ,mima :weight bold))))
-   `(markdown-header-face-3 ((t (:foreground ,yorishige :weight bold))))
-   `(markdown-header-face-4 ((t (:foreground ,shizuku :weight bold))))
-   `(markdown-header-face-5 ((t (:foreground ,tokiyuki :weight bold))))
-   `(markdown-header-face-6 ((t (:foreground ,miko :weight bold))))
-   `(markdown-header-delimiter-face ((t (:foreground ,muted))))
-   `(markdown-link-face ((t (:foreground ,tokiyuki :underline t))))
-   `(markdown-url-face ((t (:foreground ,tokiyuki :slant italic :underline t))))
-   `(markdown-code-face ((t (:foreground ,yorishige))))
-   `(markdown-inline-code-face ((t (:foreground ,yorishige))))
-   `(markdown-blockquote-face ((t (:foreground ,faint :slant italic))))
-   `(markdown-list-face ((t (:foreground ,mima))))
-   `(markdown-bold-face ((t (:weight bold))))
-   `(markdown-italic-face ((t (:slant italic))))
-   `(markdown-strike-through-face ((t (:strike-through t :foreground ,muted))))
-   `(markdown-markup-face ((t (:foreground ,muted))))
-
-   ;; --- org-mode basics ------------------------------------------------
+   ;; --- org-mode basics -------------------------------------------------
    `(org-level-1 ((t (:foreground ,ayako :weight bold))))
    `(org-level-2 ((t (:foreground ,mima :weight bold))))
    `(org-level-3 ((t (:foreground ,yorishige :weight bold))))
@@ -431,7 +363,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(sailorfe-org-todo-wait ((t (:background ,tokiyuki :foreground ,low :weight bold))))
    `(sailorfe-org-todo-void ((t (:background ,high :foreground ,low :weight bold :strikethrough t))))
 
-   ;; --- org-agenda -----------------------------------------------------
+   ;; --- org-agenda -------------------------------------------------------
    `(org-agenda-structure ((t (:foreground ,ayako :weight bold))))
    `(org-agenda-date ((t (:foreground ,tokiyuki))))
    `(org-agenda-date-weekend ((t (:foreground ,faint))))
@@ -454,7 +386,91 @@ Defaults to +0.1 lightness and no saturation change."
    `(org-column ((t (:background ,surface))))
    `(org-column-title ((t (:background ,surface :foreground ,ayako :weight bold))))
 
-   ;; --- magit ------------------------------------------------------------
+   ;; --- eww ---------------------------------------------------------------
+   `(eww-form-file ((t (:foreground ,base :background ,faint :box nil))))
+   `(eww-form-submit ((t (:foreground ,base :background ,faint :box nil))))
+   `(eww-form-text ((t (:foreground ,base :background ,text :box nil))))
+   `(eww-form-select ((t (:foreground ,base :background ,shizuku :box nil))))
+   `(eww-form-checkbox ((t (:foreground ,base :background ,shizuku :box nil))))
+   `(eww-form-textarea ((t (:foreground ,base :background ,text :box nil))))
+   `(eww-invalid-certificate ((t :foreground ,miko :weight bold)))
+   `(eww-valid-certificate ((t :foreground ,yorishige :weight bold)))
+
+   ;; =====================================================================
+   ;; external packages
+   ;; =====================================================================
+
+   ;; --- diff-hl -----------------------------------------------------------
+   `(diff-hl-insert ((t (:foreground ,yorishige))))
+   `(diff-hl-delete ((t (:foreground ,miko))))
+   `(diff-hl-change ((t (:foreground ,ayako))))
+
+   ;; --- diredfl -------------------------------------------------------
+   `(diredfl-dir-heading ((t (:foreground ,ayako :weight bold))))
+   `(diredfl-dir-name ((t (:foreground ,tokiyuki))))
+   `(diredfl-dir-priv ((t (:foreground ,tokiyuki))))
+   `(diredfl-file-name ((t (:foreground ,text))))
+   `(diredfl-file-suffix ((t (:foreground ,faint))))
+   `(diredfl-symlink ((t (:foreground ,shizuku))))
+   `(diredfl-number ((t (:foreground ,mima))))
+   `(diredfl-date-time ((t (:foreground ,faint))))
+   `(diredfl-deletion ((t (:foreground ,miko :weight bold))))
+   `(diredfl-deletion-file-name ((t (:foreground ,miko :strike-through t))))
+   `(diredfl-flag-mark ((t (:foreground ,ayako :weight bold :background ,overlay))))
+   `(diredfl-flag-mark-line ((t (:background ,overlay))))
+   `(diredfl-ignored-file-name ((t (:foreground ,muted))))
+   `(diredfl-compressed-file-suffix ((t (:foreground ,shizuku))))
+   `(diredfl-compressed-file-name ((t (:foreground ,text))))
+   `(diredfl-executable-flag ((t (:foreground ,yorishige :weight bold))))
+   `(diredfl-read-priv ((t (:foreground ,mima))))
+   `(diredfl-write-priv ((t (:foreground ,mima))))
+   `(diredfl-exec-priv ((t (:foreground ,yorishige))))
+   `(diredfl-no-priv ((t (:foreground ,muted))))
+   `(diredfl-rare-priv ((t (:foreground ,shizuku :weight bold))))
+   `(diredfl-link-priv ((t (:foreground ,shizuku))))
+   `(diredfl-autofile-name ((t (:foreground ,faint :slant italic))))
+   `(diredfl-tagged-autofile-name ((t (:foreground ,ayako :slant italic))))
+
+   ;; --- flycheck --------------------------------------------------------
+   `(flycheck-error ((t (:underline (:style wave :color ,miko)))))
+   `(flycheck-warning ((t (:underline (:style wave :color ,mima)))))
+   `(flycheck-info ((t (:underline (:style wave :color ,tokiyuki)))))
+   `(flycheck-fringe-error ((t (:foreground ,miko :weight bold))))
+   `(flycheck-fringe-warning ((t (:foreground ,mima :weight bold))))
+   `(flycheck-fringe-info ((t (:foreground ,tokiyuki :weight bold))))
+   `(flycheck-error-list-error ((t (:foreground ,miko :weight bold))))
+   `(flycheck-error-list-warning ((t (:foreground ,mima :weight bold))))
+   `(flycheck-error-list-info ((t (:foreground ,tokiyuki))))
+
+   ;; --- jinx ------------------------------------------------------------
+   `(jinx-misspelled ((t (:foreground ,miko :underline (:style wave :color ,miko)))))
+   `(jinx-highlight ((t (:foreground ,base :background ,mima))))
+
+   ;; --- eldoc-box -------------------------------------------------------
+   `(eldoc-box-body ((t (:background ,surface :foreground ,text))))
+   `(eldoc-box-border ((t (:background ,muted))))
+
+   ;; --- markdown-mode -------------------------------------------------
+   `(markdown-header-face ((t (:foreground ,ayako :weight bold))))
+   `(markdown-header-face-1 ((t (:foreground ,ayako :weight bold))))
+   `(markdown-header-face-2 ((t (:foreground ,mima :weight bold))))
+   `(markdown-header-face-3 ((t (:foreground ,yorishige :weight bold))))
+   `(markdown-header-face-4 ((t (:foreground ,shizuku :weight bold))))
+   `(markdown-header-face-5 ((t (:foreground ,tokiyuki :weight bold))))
+   `(markdown-header-face-6 ((t (:foreground ,miko :weight bold))))
+   `(markdown-header-delimiter-face ((t (:foreground ,muted))))
+   `(markdown-link-face ((t (:foreground ,tokiyuki :underline t))))
+   `(markdown-url-face ((t (:foreground ,tokiyuki :slant italic :underline t))))
+   `(markdown-code-face ((t (:foreground ,yorishige))))
+   `(markdown-inline-code-face ((t (:foreground ,yorishige))))
+   `(markdown-blockquote-face ((t (:foreground ,faint :slant italic))))
+   `(markdown-list-face ((t (:foreground ,mima))))
+   `(markdown-bold-face ((t (:weight bold))))
+   `(markdown-italic-face ((t (:slant italic))))
+   `(markdown-strike-through-face ((t (:strike-through t :foreground ,muted))))
+   `(markdown-markup-face ((t (:foreground ,muted))))
+
+   ;; --- magit / transient -------------------------------------------------
 
    ;; sections / headers
    `(magit-section-heading ((t (:foreground ,ayako :weight bold))))
@@ -533,7 +549,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(magit-blame-date ((t (:foreground ,muted))))
    `(magit-blame-name ((t (:foreground ,ayako))))
 
-   ;; --- in-buffer completion popups (corfu) ----------------------------
+   ;; --- corfu ----------------------------------------------------------
    `(corfu-default ((t (:background ,surface :foreground ,text))))
    `(corfu-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
    `(corfu-bar ((t (:background ,high))))
@@ -541,7 +557,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(corfu-annotations ((t (:foreground ,muted :slant italic))))
    `(corfu-deprecated ((t (:foreground ,muted :strike-through t))))
 
-   ;; --- minibuffer completion UI ---------------------------------------
+   ;; --- vertico / orderless ---------------------------------------------
    `(vertico-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
    `(vertico-group-title ((t (:foreground ,faint :weight bold))))
    `(vertico-group-separator ((t (:foreground ,muted :strike-through t))))
@@ -551,16 +567,6 @@ Defaults to +0.1 lightness and no saturation change."
    `(orderless-match-face-2 ((t (:foreground ,yorishige :weight bold))))
    `(orderless-match-face-3 ((t (:foreground ,shizuku :weight bold))))
 
-   ;; --- eww -------------------------------------------------------------
-   `(eww-form-file ((t (:foreground ,base :background ,faint :box nil))))
-   `(eww-form-submit ((t (:foreground ,base :background ,faint :box nil))))
-   `(eww-form-text ((t (:foreground ,base :background ,text :box nil))))
-   `(eww-form-select ((t (:foreground ,base :background ,shizuku :box nil))))
-   `(eww-form-checkbox ((t (:foreground ,base :background ,shizuku :box nil))))
-   `(eww-form-textarea ((t (:foreground ,base :background ,text :box nil))))
-   `(eww-invalid-certificate ((t :foreground ,miko :weight bold)))
-   `(eww-valid-certificate ((t :foreground ,yorishige :weight bold)))
-
    ;; --- dashboard -------------------------------------------------------
    `(dashboard-heading ((t (:foreground ,tokiyuki :weight bold))))
    `(dashboard-navigator ((t (:foreground ,shizuku :weight bold))))
@@ -569,7 +575,7 @@ Defaults to +0.1 lightness and no saturation change."
    `(dashboard-footer-face ((t (:foreground ,faint :slant italic))))
    `(dashboard-text-banner ((t (:foreground ,tokiyuki))))
    `(dashboard-banner-logo-title ((t (:foreground ,text))))
-   
+
    ;; --- vterm -----------------------------------------------------------
    `(vterm-color-black ((t (:foreground ,low :background ,low))))
    `(vterm-color-bright-black ((t (:foreground ,med :background ,med))))
