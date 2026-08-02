@@ -1,0 +1,36 @@
+set default-bg                  "{{base}}"
+set default-fg                  "{{text}}"
+
+set statusbar-fg                "{{text}}"
+set statusbar-bg                "{{surface}}"
+
+set inputbar-bg                 "{{overlay}}"
+set inputbar-fg                 "{{tokiyuki}}"
+
+set notification-bg             "{{text}}"
+set notification-fg             "{{base}}"
+
+set notification-error-bg       "{{miko}}"
+set notification-error-fg       "{{base}}"
+
+set notification-warning-bg     "{{ayako}}"
+set notification-warning-fg     "{{base}}"
+
+set highlight-color             "rgba(205, 158, 29, 0.5)"
+set highlight-active-color      "rgba(237, 182, 58, 0.5)"
+set highlight-fg                "{{base}}"
+
+set completion-group-bg         "{{surface}}"
+set completion-group-fg         "{{text}}"
+
+set completion-bg               "{{overlay}}"
+set completion-fg               "{{tokiyuki}}"
+
+set completion-highlight-fg     "{{surface}}"
+set completion-highlight-bg     "{{tokiyuki}}"
+
+set recolor-lightcolor          "{{base}}"
+set recolor-darkcolor           "{{text}}"
+
+set recolor                     "false"
+set recolor-keephue             "false"

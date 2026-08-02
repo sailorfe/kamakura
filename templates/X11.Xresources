@@ -1,0 +1,22 @@
+! kamakura colors for Xresources
+
+*background: {{base}}
+*foreground: {{text}}
+
+*color0: {{med}}
+*color1: {{miko}}
+*color2: {{yorishige}}
+*color3: {{mima}}
+*color4: {{tokiyuki}}
+*color5: {{ayako}}
+*color6: {{shizuku}}
+*color7: {{text}}
+
+*color8: {{high}}
+*color9: {{taisha}}
+*color10: {{suwa}}
+*color11: {{sasaki}}
+*color12: {{hojo}}
+*color13: {{mochizuki}}
+*color14: {{kami}}
+*color15: {{light}}

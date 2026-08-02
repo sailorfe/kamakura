@@ -628,7 +628,10 @@ STRIP-HASH optionally removes # from templates that require bare rrggbb."
     ("templates/shell.sh" . "extras/shell/kamakura.sh")
     ("templates/termux.properties" . "extras/termux/kamakura.properties")
     ("templates/tty.conf" "extras/tty/kamakura.conf" t)
-    ("templates/vim.vim" "extras/vim/colors/kamakura.vim")))
+    ("templates/vim.vim" "extras/vim/colors/kamakura.vim")
+    ("templates/X11.Xresources" "extras/X11/kamakura.Xresources")
+    ("templates/zathura" "extras/zathura/kamakura")
+    ))
 
 (defun kamakura/export-all ()
   "Render every template in `kamakura/export-targets' against `kamakura/palette'.

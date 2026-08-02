@@ -1,0 +1,22 @@
+! kamakura colors for Xresources
+
+*background: #f9f3e0
+*foreground: #5d4c3b
+
+*color0: #dcd4c5
+*color1: #aa172a
+*color2: #37892d
+*color3: #cd9e1d
+*color4: #937abc
+*color5: #dd6d76
+*color6: #297f88
+*color7: #5d4c3b
+
+*color8: #d7c697
+*color9: #ca4455
+*color10: #5fad56
+*color11: #e2b63a
+*color12: #af9ccd
+*color13: #e7979d
+*color14: #55a1a9
+*color15: #413324
