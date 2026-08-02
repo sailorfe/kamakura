@@ -13,11 +13,11 @@ set notification-fg             "{{base}}"
 set notification-error-bg       "{{miko}}"
 set notification-error-fg       "{{base}}"
 
-set notification-warning-bg     "{{ayako}}"
+set notification-warning-bg     "{{mima}}"
 set notification-warning-fg     "{{base}}"
 
-set highlight-color             "rgba(205, 158, 29, 0.5)"
-set highlight-active-color      "rgba(237, 182, 58, 0.5)"
+set highlight-color             "rgba({{ayako-rgb}}, 0.5)"
+set highlight-active-color      "rgba({{mochizuki-rgb}}, 0.5)"
 set highlight-fg                "{{base}}"
 
 set completion-group-bg         "{{surface}}"

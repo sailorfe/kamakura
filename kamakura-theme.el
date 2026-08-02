@@ -29,6 +29,13 @@ Defaults to +0.1 lightness and no saturation change."
    (min 1.0 (max 0.0 (+ s (or delta-s 0.0))))
    (min 1.0 (max 0.0 (+ l (or delta-l 0.1))))))
 
+(defun kamakura/rgb (hex)
+  "Convert HEX color to a comma-separated RGB string: \"r, g, b\"."
+  (let* ((r (string-to-number (substring hex 1 3) 16))
+         (g (string-to-number (substring hex 3 5) 16))
+         (b (string-to-number (substring hex 5 7) 16)))
+    (format "%d, %d, %d" r g b)))
+
 (defun kamakura/nearest-256 (hex)
   "Return the nearest xterm-256 color index for HEX."
   (let* ((r (string-to-number (substring hex 1 3) 16))
@@ -90,6 +97,10 @@ Defaults to +0.1 lightness and no saturation change."
          (mochizuki (kamakura/bright 355 0.63 0.65 0.1))
          (kami (kamakura/bright 186 0.53 0.35 0.15 -0.2))
 
+         ;; this is just for zathura
+         (ayako-rgb (kamakura/rgb ayako))
+         (mochizuki-rgb (kamakura/rgb mochizuki))
+
          (raw
           `((base . ,base)
             (surface . ,surface)
@@ -113,6 +124,8 @@ Defaults to +0.1 lightness and no saturation change."
             (low . ,low)
             (med . ,med)
             (high . ,high)
+            (ayako-rgb . ,ayako-rgb)
+            (mochizuki-rgb . ,mochizuki-rgb)
             )))
     (append raw
             (mapcar (lambda (p)
@@ -594,7 +607,8 @@ Defaults to +0.1 lightness and no saturation change."
    `(vterm-color-white ((t (:foreground ,text :background ,text))))
    `(vterm-color-bright-white ((t (:foreground ,light :background ,light))))
    `(vterm-color-underline ((t (:foreground ,shizuku))))
-   `(vterm-color-inverse-video ((t (:background ,base :inverse-video t))))))
+   `(vterm-color-inverse-video ((t (:background ,base :inverse-video t))))
+   ))
 
 ;;;###autoload
 (when (and (boundp 'custom-theme-load-path) load-file-name)
