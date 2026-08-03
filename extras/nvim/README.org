@@ -1,0 +1,49 @@
+* kamakura.lua
+
+** supported plugins
+
++ [[https://github.com/folke/trouble.nvim][trouble.nvim]]
++ [[https://github.com/nvim-mini/mini.nvim][mini.nvim]] diff, statusline, tabline
++ [[https://github.com/lukas-reineke/indent-blankline.nvim][indent-blankline.nvim]]
++ [[https://github.com/lewis6991/gitsigns.nvim][gitsigns.nvim]]
++ [[https://github.com/MeanderingProgrammer/render-markdown.nvim][render-markdown.nvim]]
+
+** installation
+
+since this port is a subdirectory, you'll have to point neovim here so it can find =lua/kamakura.lua=. without a package manager:
+
+#+BEGIN_SRC sh
+  # as submodule in version-controlled dotfiles
+  git submodule add https://codeberg.org/sailorfe/kamakura pack/plugins/start
+  # or
+  git clone https://codeberg.org/sailorfe/kamakura .local/share/nvim/site/pack/plugins/start
+#+END_SRC
+
+then add =extras/nvim= to your =packpath=.
+
+#+BEGIN_SRC lua
+local kamakura_path = vim.fn.stdpath("data") .. "/site/pack/plugins/start/kamakura/extras/nvim"
+
+vim.opt.rtp:append(kamakura_path)
+package.path = package.path .. ";" .. kamakura_path .. "/lua/?.lua;" .. kamakura_path .. "/lua/?/init.lua"
+
+require("kamakura").setup()
+#+END_SRC
+
+*** lazy.nvim
+
+#+BEGIN_SRC lua
+{
+  "https://codeberg.org/sailorfe/kamakura",
+  name = "kamakura",
+  config = function(plugin)
+    vim.opt.rtp:append(plugin.dir .. "/extras/nvim")
+  end,
+}
+#+END_SRC
+
+*** packer.nvim
+
+#+BEGIN_SRC lua
+{ use 'https://codeberg.org/sailorfe/kamakura', rtp = 'extras/nvim' }
+#+END_SRC
