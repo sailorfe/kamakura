@@ -15,34 +15,34 @@ endif
 " == ui ===========================
 
 hi Normal       guifg=#5d4c3b guibg=#f9f3e0 ctermfg=239 ctermbg=230
-hi NonText      guifg=#8d7d66 ctermfg=101
-hi EndOfBuffer  guifg=#8d7d66 ctermfg=101
+hi NonText      guifg=#a99b88 ctermfg=138
+hi EndOfBuffer  guifg=#a99b88 ctermfg=138
 hi SpecialKey   guifg=#297f88 ctermfg=30
 hi ColorColumn  guibg=#f8efd2 ctermbg=230
 hi Cursor       guifg=#f9f3e0 guibg=#413324 ctermfg=230 ctermbg=236
 hi CursorLine   guibg=#f9e6c2 ctermbg=223 cterm=NONE gui=NONE
 hi CursorColumn guibg=#f9e6c2 ctermbg=223
 hi CursorLineNr guifg=#413324 guibg=#f9e6c2 ctermfg=236 ctermbg=223
-hi LineNr       guifg=#8d7d66 ctermfg=101
+hi LineNr       guifg=#a99b88 ctermfg=138
 hi MatchParen   guifg=#413324 guibg=#f9e6c2 gui=bold ctermfg=236 ctermbg=223 cterm=bold
-hi SignColumn   guifg=#a59b8c ctermbg=247 guibg=#f9e6c2 ctermbg=223
+hi SignColumn   guifg=#897c6b ctermbg=101 guibg=#f9e6c2 ctermbg=223
 hi FoldColumn   guifg=#d7c697 guibg=#ede9dd ctermfg=186 ctermbg=254
-hi Folded       guifg=#a59b8c ctermfg=247 guibg=#f9e6c2 ctermbg=223
-hi Conceal      guifg=#8d7d66 ctermbg=101 guibg=#f8efd2 ctermbg=230
+hi Folded       guifg=#897c6b ctermfg=101 guibg=#f9e6c2 ctermbg=223
+hi Conceal      guifg=#a99b88 ctermbg=138 guibg=#f8efd2 ctermbg=230
 hi Visual       guibg=#dd6d76 guifg=#f9f3e0 ctermbg=168 ctermfg=230
 hi Search       guifg=#f9f3e0 guibg=#cd9e1d ctermfg=230 ctermbg=178
 hi IncSearch    guifg=#f9f3e0 guibg=#937abc ctermfg=230 ctermbg=103
 hi QuickFixLine guibg=#f9e6c2 ctermbg=223
 hi WildMenu     guifg=#f9f3e0 guibg=#5d4c3b ctermfg=230 ctermbg=239
 hi StatusLine       term=bold cterm=bold guifg=#413324 guibg=#f8efd2 ctermfg=236 ctermbg=230
-hi StatusLineNC     term=bold cterm=bold guifg=#8d7d66 guibg=#f9f3e0 ctermfg=101 ctermbg=230
+hi StatusLineNC     term=bold cterm=bold guifg=#a99b88 guibg=#f9f3e0 ctermfg=138 ctermbg=230
 hi StatusLineTerm   term=bold cterm=bold ctermfg=230 guibg=#37892d ctermbg=64
 hi StatusLineTermNC term=bold cterm=bold ctermfg=230 guibg=#5fad56 ctermbg=71
 hi VertSplit        guifg=#f8efd2 guibg=#f9f3e0 ctermfg=230 ctermbg=230
-hi TabLine          guifg=#8d7d66 guibg=#f8efd2 ctermfg=101 ctermbg=230
+hi TabLine          guifg=#a99b88 guibg=#f8efd2 ctermfg=138 ctermbg=230
 hi TabLineSel       guifg=#413324 guibg=#f9e6c2 ctermfg=236 ctermbg=223
 hi ToolbarLine      guibg=#d7c697 ctermbg=186
-hi ToolbarButton    guibg=#a59b8c ctermbg=247
+hi ToolbarButton    guibg=#897c6b ctermbg=101
 hi Pmenu        guifg=#5d4c3b guibg=#f8efd2 ctermfg=239 ctermbg=230
 hi PmenuSel     guifg=#f9f3e0 guibg=#937abc ctermfg=230 ctermbg=103
 hi PmenuSbar    guibg=#f9e6c2 ctermbg=223
@@ -56,7 +56,7 @@ hi Directory    guifg=#937abc ctermfg=103
 
 " == syntax =======================
 
-hi Comment      guifg=#a59b8c gui=italic ctermfg=247 cterm=italic
+hi Comment      guifg=#897c6b gui=italic ctermfg=101 cterm=italic
 hi Constant     guifg=#cd9e1d ctermfg=178
 hi String       guifg=#37892d ctermfg=64
 hi Identifier   guifg=#297f88 ctermfg=30

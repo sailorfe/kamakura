@@ -71,8 +71,8 @@ Defaults to +0.1 lightness and no saturation change."
          (overlay (kamakura/hsl 40 0.82 0.87))
 
          ;; foregrounds
-         (muted (kamakura/hsl 35 0.16 0.48))
-         (faint (kamakura/hsl 35 0.12 0.60))
+         (muted (kamakura/hsl 35 0.16 0.60))
+         (faint (kamakura/hsl 35 0.12 0.48))
          (text (kamakura/hsl 30 0.22 0.30))
          (light (kamakura/hsl 30 0.28 0.20))
 
