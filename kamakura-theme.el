@@ -140,460 +140,513 @@ Returns an alist of hex colors, a `NAME-rgb' comma-separated RGB string for each
     `(let* ,(mapcar (lambda (n) (list n `(alist-get ',n kamakura/palette))) names)
        ,@body)))
 
+;;; --- contrast auditing ---------------------------------------------------
+;; Dev tools, not part of theme load. only operate on palette values, so unaware of faces.
+
+(defun kamakura/relative-luminance (hex)
+  "Return the WCAG relative luminance of HEX (a \"#rrggbb\" string), in [0, 1]."
+  (cl-flet ((linearize (v)
+              (let ((c (/ v 255.0)))
+                (if (<= c 0.03928)
+                    (/ c 12.92)
+                  (expt (/ (+ c 0.055) 1.055) 2.4)))))
+    (+ (* 0.2126 (linearize (string-to-number (substring hex 1 3) 16)))
+       (* 0.7152 (linearize (string-to-number (substring hex 3 5) 16)))
+       (* 0.0722 (linearize (string-to-number (substring hex 5 7) 16))))))
+
+(defun kamakura/contrast-ratio (a b)
+  "Return the WCAG contrast ratio between hex colors A and B, in [1, 21]."
+  (let ((la (kamakura/relative-luminance a))
+        (lb (kamakura/relative-luminance b)))
+    (/ (+ (max la lb) 0.05)
+       (+ (min la lb) 0.05))))
+
+(defun kamakura/contrast (name &optional against)
+  "Report the WCAG contrast ratio of palette color NAME against AGAINST.
+Both are names from `palette-spec'; AGAINST defaults to `base'."
+  (interactive
+   (let ((names (mapcar #'car kamakura/palette-spec)))
+     (list (intern (completing-read "Color: " names))
+           (intern (completing-read "Against (default base): " names nil nil nil nil "base")))))
+  (let* ((against (or against 'base))
+         (ratio (kamakura/contrast-ratio (alist-get name kamakura/palette)
+                                         (alist-get against kamakura/palette))))
+    (when (called-interactively-p 'any)
+      (message "%s vs %s: %.2f:1  (AA text %s, AA large-text/UI %s)"
+               name against ratio
+               (if (>= ratio 4.5) "pass" "fail")
+               (if (>= ratio 3.0) "pass" "fail")))
+    ratio))
+
+(defun kamakura/audit-contrast (&optional against)
+  "Print the WCAG contrast ratio of every palette color against AGAINST.  AGAINST defaults to `base'."
+  (interactive
+   (list (intern (completing-read "Against (default base): "
+                                  (mapcar #'car kamakura/palette-spec)
+                                  nil nil nil nil "base"))))
+  (let ((against (or against 'base)))
+    (dolist (spec kamakura/palette-spec)
+      (let* ((name (car spec))
+             (ratio (kamakura/contrast name against)))
+        (message "%-14s %.2f:1  (AA text %s, AA large-text/UI %s)"
+                 name ratio
+                 (if (>= ratio 4.5) "pass" "fail")
+                 (if (>= ratio 3.0) "pass" "fail"))))))
+
 (deftheme kamakura "Nanbokuchou theme.")
 
 (kamakura/with-palette
- (custom-theme-set-faces
-  'kamakura
-  ;; --- core ui -------------------------------------------------
-  `(default ((t (:background ,base :foreground ,text))))
-  `(cursor ((t (:background ,text))))
-  `(region ((t (:background ,ayako :foreground ,base))))
-  `(secondary-selection ((t (:background ,med :foreground ,mima))))
-  `(highlight ((t (:background ,overlay :foreground ,ayako))))
-  `(hl-line ((t (:background ,overlay))))
-  `(fringe ((t (:background ,base :foreground ,muted))))
-  `(vertical-border ((t (:foreground ,surface))))
-  `(window-divider ((t (:foreground ,surface))))
-  `(window-divider-first-pixel ((t (:foreground ,surface))))
-  `(window-divider-last-pixel ((t (:foreground ,surface))))
-  `(minibuffer-prompt ((t (:foreground ,tokiyuki :weight bold))))
-  `(shadow ((t (:foreground ,muted))))
-  `(link ((t (:foreground ,tokiyuki :underline t))))
-  `(link-visited ((t (:foreground ,yorishige :underline t))))
-  `(escape-glyph ((t (:foreground ,shizuku))))
-  `(homoglyph ((t (:foreground ,shizuku))))
-  `(tooltip ((t (:background ,surface :foreground ,text))))
-  `(trailing-whitespace ((t (:background ,overlay))))
-  `(nobreak-space ((t (:foreground ,muted :underline t))))
-  `(fill-column-indicator ((t (:foreground ,high))))
-  `(bookmark-face ((t (:foreground ,tokiyuki))))
+  (custom-theme-set-faces
+   'kamakura
+   ;; --- core ui -------------------------------------------------
+   `(default ((t (:background ,base :foreground ,text))))
+   `(cursor ((t (:background ,text))))
+   `(region ((t (:background ,ayako :foreground ,base))))
+   `(secondary-selection ((t (:background ,med :foreground ,mima))))
+   `(highlight ((t (:background ,overlay :foreground ,ayako))))
+   `(hl-line ((t (:background ,overlay))))
+   `(fringe ((t (:background ,base :foreground ,muted))))
+   `(vertical-border ((t (:foreground ,surface))))
+   `(window-divider ((t (:foreground ,surface))))
+   `(window-divider-first-pixel ((t (:foreground ,surface))))
+   `(window-divider-last-pixel ((t (:foreground ,surface))))
+   `(minibuffer-prompt ((t (:foreground ,tokiyuki :weight bold))))
+   `(shadow ((t (:foreground ,muted))))
+   `(link ((t (:foreground ,tokiyuki :underline t))))
+   `(link-visited ((t (:foreground ,yorishige :underline t))))
+   `(escape-glyph ((t (:foreground ,shizuku))))
+   `(homoglyph ((t (:foreground ,shizuku))))
+   `(tooltip ((t (:background ,surface :foreground ,text))))
+   `(trailing-whitespace ((t (:background ,overlay))))
+   `(nobreak-space ((t (:foreground ,muted :underline t))))
+   `(fill-column-indicator ((t (:foreground ,high))))
+   `(bookmark-face ((t (:foreground ,tokiyuki))))
 
-  ;; --- errors / warnings / success ------------------------------
-  `(error ((t (:foreground ,miko :weight bold))))
-  `(warning ((t (:foreground ,mima :weight bold))))
-  `(success ((t (:foreground ,yorishige :weight bold))))
+   ;; --- errors / warnings / success ------------------------------
+   `(error ((t (:foreground ,miko :weight bold))))
+   `(warning ((t (:foreground ,mima :weight bold))))
+   `(success ((t (:foreground ,yorishige :weight bold))))
 
-  ;; --- mode-line / header / tab lines ---------------------------
-  `(mode-line ((t (:background ,surface :foreground ,text))))
-  `(mode-line-inactive ((t (:background ,base :foreground ,muted))))
-  `(mode-line-active ((t (:background ,surface :foreground ,text))))
-  `(mode-line-emphasis ((t (:foreground ,ayako :weight bold))))
-  `(mode-line-highlight ((t (:foreground ,ayako :box (:line-width -1 :color ,ayako)))))
-  `(mode-line-buffer-id ((t (:foreground ,text :weight bold))))
-  `(header-line ((t (:background ,med :foreground ,faint))))
-  `(header-line-highlight ((t (:background ,med :foreground ,ayako))))
-  `(tab-line ((t (:background ,surface :foreground ,muted))))
-  `(tab-line-tab ((t (:background ,surface :foreground ,muted))))
-  `(tab-line-tab-inactive ((t (:background ,surface :foreground ,muted))))
-	`(tab-line-tab-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
-	`(tab-line-highlight ((t (:background ,overlay :foreground ,ayako))))
-	`(tab-bar ((t (:background ,surface :foreground ,muted))))
-  `(tab-bar-tab ((t (:background ,overlay :foreground ,ayako :weight bold))))
-  `(tab-bar-tab-inactive ((t (:background ,surface :foreground ,muted))))
+   ;; --- mode-line / header / tab lines ---------------------------
+   `(mode-line ((t (:background ,surface :foreground ,text))))
+   `(mode-line-inactive ((t (:background ,base :foreground ,muted))))
+   `(mode-line-active ((t (:background ,surface :foreground ,text))))
+   `(mode-line-emphasis ((t (:foreground ,ayako :weight bold))))
+   `(mode-line-highlight ((t (:foreground ,ayako :box (:line-width -1 :color ,ayako)))))
+   `(mode-line-buffer-id ((t (:foreground ,text :weight bold))))
+   `(header-line ((t (:background ,med :foreground ,faint))))
+   `(header-line-highlight ((t (:background ,med :foreground ,ayako))))
+   `(tab-line ((t (:background ,surface :foreground ,muted))))
+   `(tab-line-tab ((t (:background ,surface :foreground ,muted))))
+   `(tab-line-tab-inactive ((t (:background ,surface :foreground ,muted))))
+	 `(tab-line-tab-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
+	 `(tab-line-highlight ((t (:background ,overlay :foreground ,ayako))))
+	 `(tab-bar ((t (:background ,surface :foreground ,muted))))
+   `(tab-bar-tab ((t (:background ,overlay :foreground ,ayako :weight bold))))
+   `(tab-bar-tab-inactive ((t (:background ,surface :foreground ,muted))))
 
-  ;; --- line numbers -------------------------------------------------
-  `(line-number ((t (:foreground ,muted :background ,base))))
-  `(line-number-current-line ((t (:foreground ,text :background ,overlay :weight bold))))
-  `(line-number-major-tick ((t (:foreground ,faint :background ,base))))
-  `(line-number-minor-tick ((t (:foreground ,muted :background ,base))))
+   ;; --- line numbers -------------------------------------------------
+   `(line-number ((t (:foreground ,muted :background ,base))))
+   `(line-number-current-line ((t (:foreground ,text :background ,overlay :weight bold))))
+   `(line-number-major-tick ((t (:foreground ,faint :background ,base))))
+   `(line-number-minor-tick ((t (:foreground ,muted :background ,base))))
 
-  ;; --- search / isearch ---------------------------------------------
-  `(isearch ((t (:background ,mima :foreground ,base))))
-  `(isearch-fail ((t (:background ,miko :foreground ,light))))
-  `(isearch-group-1 ((t (:background ,tokiyuki :foreground ,base))))
-  `(isearch-group-2 ((t (:background ,yorishige :foreground ,base))))
-  `(lazy-highlight ((t (:background ,med :foreground ,mima))))
-  `(query-replace ((t (:background ,mima :foreground ,base))))
+   ;; --- search / isearch ---------------------------------------------
+   `(isearch ((t (:background ,mima :foreground ,base))))
+   `(isearch-fail ((t (:background ,miko :foreground ,light))))
+   `(isearch-group-1 ((t (:background ,tokiyuki :foreground ,base))))
+   `(isearch-group-2 ((t (:background ,yorishige :foreground ,base))))
+   `(lazy-highlight ((t (:background ,med :foreground ,mima))))
+   `(query-replace ((t (:background ,mima :foreground ,base))))
 
-  ;; --- show-paren ---------------------------------------------------
-  `(show-paren-match ((t (:background ,high :weight bold))))
-  `(show-paren-match-expression ((t (:background ,overlay))))
-  `(show-paren-mismatch ((t (:background ,miko :foreground ,light :weight bold))))
+   ;; --- show-paren ---------------------------------------------------
+   `(show-paren-match ((t (:background ,high :weight bold))))
+   `(show-paren-match-expression ((t (:background ,overlay))))
+   `(show-paren-mismatch ((t (:background ,miko :foreground ,light :weight bold))))
 
-  ;; --- sh ------------------------------------------------------------
-  `(sh-heredoc ((t (:foreground ,mima :weight bold))))
-  `(sh-quoted-exec ((t :foreground ,miko :slant italic)))
-  `(sh-escaped-newline ((t :foreground ,faint)))
+   ;; --- sh ------------------------------------------------------------
+   `(sh-heredoc ((t (:foreground ,mima :weight bold))))
+   `(sh-quoted-exec ((t :foreground ,miko :slant italic)))
+   `(sh-escaped-newline ((t :foreground ,faint)))
 
-  ;; --- font-lock (syntax highlighting) -------------------------------
-  ;; comment
-  `(font-lock-comment-face ((t (:foreground ,faint :slant italic))))
-  `(font-lock-comment-delimiter-face ((t (:foreground ,faint :slant italic))))
-  `(font-lock-doc-face ((t (:foreground ,faint :slant italic))))
-  `(font-lock-doc-markup-face ((t (:foreground ,faint))))
+   ;; --- font-lock (syntax highlighting) -------------------------------
+   ;; comment
+   `(font-lock-comment-face ((t (:foreground ,faint :slant italic))))
+   `(font-lock-comment-delimiter-face ((t (:foreground ,faint :slant italic))))
+   `(font-lock-doc-face ((t (:foreground ,faint :slant italic))))
+   `(font-lock-doc-markup-face ((t (:foreground ,faint))))
 
-  ;; constant
-  `(font-lock-constant-face ((t (:foreground ,mima))))
-  `(font-lock-number-face ((t (:foreground ,mima))))
+   ;; constant
+   `(font-lock-constant-face ((t (:foreground ,mima))))
+   `(font-lock-number-face ((t (:foreground ,mima))))
 
-  ;; type
-  `(font-lock-type-face ((t (:foreground ,mima))))
+   ;; type
+   `(font-lock-type-face ((t (:foreground ,mima))))
 
-  ;; string
-  `(font-lock-string-face ((t (:foreground ,yorishige))))
+   ;; string
+   `(font-lock-string-face ((t (:foreground ,yorishige))))
 
-  ;; identifier
-  `(font-lock-variable-name-face ((t (:foreground ,shizuku))))
-  `(font-lock-variable-use-face ((t (:foreground ,shizuku))))
+   ;; identifier
+   `(font-lock-variable-name-face ((t (:foreground ,shizuku))))
+   `(font-lock-variable-use-face ((t (:foreground ,shizuku))))
 
-  ;; function
-  `(font-lock-function-name-face ((t (:foreground ,tokiyuki))))
-  `(font-lock-function-call-face ((t (:foreground ,tokiyuki))))
+   ;; function
+   `(font-lock-function-name-face ((t (:foreground ,tokiyuki))))
+   `(font-lock-function-call-face ((t (:foreground ,tokiyuki))))
 
-  ;; statement
-  `(font-lock-keyword-face ((t (:foreground ,ayako :weight bold))))
+   ;; statement
+   `(font-lock-keyword-face ((t (:foreground ,ayako :weight bold))))
 
-  ;; preproc
-  `(font-lock-preprocessor-face ((t (:foreground ,ayako))))
+   ;; preproc
+   `(font-lock-preprocessor-face ((t (:foreground ,ayako))))
 
-  ;; special
-  `(font-lock-builtin-face ((t (:foreground ,ayako :weight bold))))
-  `(font-lock-escape-face ((t (:foreground ,muted))))
-  `(font-lock-regexp-grouping-backslash ((t (:foreground ,muted :weight bold))))
-  `(font-lock-regexp-grouping-construct ((t (:foreground ,muted :weight bold))))
+   ;; special
+   `(font-lock-builtin-face ((t (:foreground ,ayako :weight bold))))
+   `(font-lock-escape-face ((t (:foreground ,muted))))
+   `(font-lock-regexp-grouping-backslash ((t (:foreground ,muted :weight bold))))
+   `(font-lock-regexp-grouping-construct ((t (:foreground ,muted :weight bold))))
 
-  ;; misc
-  `(font-lock-warning-face ((t (:foreground ,miko :weight bold))))
-  `(font-lock-negation-char-face ((t (:foreground ,tokiyuki :weight bold))))
-  `(font-lock-property-name-face ((t (:foreground ,text))))
-  `(font-lock-property-use-face ((t (:foreground ,text))))
-  `(font-lock-operator-face ((t (:foreground ,text))))
-  `(font-lock-bracket-face ((t (:foreground ,text))))
-  `(font-lock-punctuation-face ((t (:foreground ,text))))
-  `(font-lock-delimiter-face ((t (:foreground ,muted))))
+   ;; misc
+   `(font-lock-warning-face ((t (:foreground ,miko :weight bold))))
+   `(font-lock-negation-char-face ((t (:foreground ,tokiyuki :weight bold))))
+   `(font-lock-property-name-face ((t (:foreground ,text))))
+   `(font-lock-property-use-face ((t (:foreground ,text))))
+   `(font-lock-operator-face ((t (:foreground ,text))))
+   `(font-lock-bracket-face ((t (:foreground ,text))))
+   `(font-lock-punctuation-face ((t (:foreground ,text))))
+   `(font-lock-delimiter-face ((t (:foreground ,muted))))
 
-  ;; --- diff-mode ------------------------------------------------
-  `(diff-header ((t (:background ,surface))))
-  `(diff-file-header ((t (:background ,surface :foreground ,text :weight bold))))
-  `(diff-hunk-header ((t (:background ,surface :foreground ,muted))))
-  `(diff-context ((t (:foreground ,faint))))
-  `(diff-added ((t (:foreground ,yorishige))))
-  `(diff-removed ((t (:foreground ,miko))))
-  `(diff-changed ((t (:foreground ,ayako))))
-  `(diff-refine-added ((t (:background ,yorishige :foreground ,base))))
-  `(diff-refine-removed ((t (:background ,miko :foreground ,light))))
-  `(diff-refine-changed ((t (:background ,ayako :foreground ,base))))
-  `(diff-indicator-added ((t (:foreground ,yorishige))))
-  `(diff-indicator-removed ((t (:foreground ,miko))))
-  `(diff-indicator-changed ((t (:foreground ,ayako))))
+   ;; --- diff-mode ------------------------------------------------
+   `(diff-header ((t (:background ,surface))))
+   `(diff-file-header ((t (:background ,surface :foreground ,text :weight bold))))
+   `(diff-hunk-header ((t (:background ,surface :foreground ,muted))))
+   `(diff-context ((t (:foreground ,faint))))
+   `(diff-added ((t (:foreground ,yorishige))))
+   `(diff-removed ((t (:foreground ,miko))))
+   `(diff-changed ((t (:foreground ,ayako))))
+   `(diff-refine-added ((t (:background ,yorishige :foreground ,base))))
+   `(diff-refine-removed ((t (:background ,miko :foreground ,light))))
+   `(diff-refine-changed ((t (:background ,ayako :foreground ,base))))
+   `(diff-indicator-added ((t (:foreground ,yorishige))))
+   `(diff-indicator-removed ((t (:foreground ,miko))))
+   `(diff-indicator-changed ((t (:foreground ,ayako))))
 
-  ;; --- flyspell -----------------------------------------------------
-  `(flyspell-incorrect ((t (:foreground ,miko :underline (:style wave)))))
-  `(flyspell-duplicate ((t (:foreground ,mima :underline (:style wave)))))
+   ;; --- flyspell -----------------------------------------------------
+   `(flyspell-incorrect ((t (:foreground ,miko :underline (:style wave)))))
+   `(flyspell-duplicate ((t (:foreground ,mima :underline (:style wave)))))
 
-  ;; --- completions ----------------------------------------------------
-  `(completions-common-part ((t (:foreground ,ayako :weight bold))))
-  `(completions-first-difference ((t (:foreground ,shizuku :weight bold))))
-  `(completions-annotations ((t (:foreground ,muted :slant italic))))
-  `(completions-group-title ((t (:foreground ,faint :weight bold))))
+   ;; --- completions ----------------------------------------------------
+   `(completions-common-part ((t (:foreground ,ayako :weight bold))))
+   `(completions-first-difference ((t (:foreground ,shizuku :weight bold))))
+   `(completions-annotations ((t (:foreground ,muted :slant italic))))
+   `(completions-group-title ((t (:foreground ,faint :weight bold))))
 
-  ;; --- widgets / custom-mode --------------------------------------------
-  `(widget-field ((t (:background ,overlay :foreground ,text :box (:line-width 1 :color ,muted)))))
-  `(widget-single-line-field ((t (:background ,overlay :foreground ,text))))
-  `(widget-button ((t (:foreground ,ayako :weight bold))))
-  `(widget-documentation ((t (:foreground ,faint))))
-  `(custom-button ((t (:background ,surface :foreground ,text :box (:line-width 1 :color ,muted)))))
-  `(custom-button-mouse ((t (:background ,overlay :foreground ,ayako :box (:line-width 1 :color ,ayako)))))
-  `(custom-button-pressed ((t (:background ,overlay :foreground ,ayako :box (:line-width 1 :color ,ayako)))))
-  `(custom-state ((t (:foreground ,yorishige))))
-  `(custom-variable-tag ((t (:foreground ,ayako :weight bold))))
-  `(custom-group-tag ((t (:foreground ,tokiyuki :weight bold))))
+   ;; --- widgets / custom-mode --------------------------------------------
+   `(widget-field ((t (:background ,overlay :foreground ,text :box (:line-width 1 :color ,muted)))))
+   `(widget-single-line-field ((t (:background ,overlay :foreground ,text))))
+   `(widget-button ((t (:foreground ,ayako :weight bold))))
+   `(widget-documentation ((t (:foreground ,faint))))
+   `(custom-button ((t (:background ,surface :foreground ,text :box (:line-width 1 :color ,muted)))))
+   `(custom-button-mouse ((t (:background ,overlay :foreground ,ayako :box (:line-width 1 :color ,ayako)))))
+   `(custom-button-pressed ((t (:background ,overlay :foreground ,ayako :box (:line-width 1 :color ,ayako)))))
+   `(custom-state ((t (:foreground ,yorishige))))
+   `(custom-variable-tag ((t (:foreground ,ayako :weight bold))))
+   `(custom-group-tag ((t (:foreground ,tokiyuki :weight bold))))
 
-  ;; --- misc buffer / dired ---------------------------------------------
-  `(match ((t (:background ,med :foreground ,mima))))
-  `(next-error ((t (:background ,overlay))))
-  `(help-key-binding ((t (:foreground ,ayako :background ,surface :box (:line-width 1 :color ,muted)))))
-  `(dired-directory ((t (:foreground ,tokiyuki))))
-  `(dired-symlink ((t (:foreground ,shizuku))))
-  `(dired-broken-symlink ((t (:foreground ,miko :underline t))))
-  `(dired-marked ((t (:foreground ,ayako :weight bold))))
-  `(dired-flagged ((t (:foreground ,miko :weight bold))))
-  `(dired-header ((t (:foreground ,ayako :weight bold))))
-  `(dired-ignored ((t (:foreground ,muted))))
-  `(dired-mark ((t (:foreground ,ayako :weight bold))))
-  `(dired-warning ((t (:foreground ,mima :weight bold))))
-  `(dired-perm-write ((t (:foreground ,mima))))
-  `(dired-set-id ((t (:foreground ,shizuku :weight bold))))
-  `(dired-special ((t (:foreground ,yorishige))))
+   ;; --- misc buffer / dired ---------------------------------------------
+   `(match ((t (:background ,med :foreground ,mima))))
+   `(next-error ((t (:background ,overlay))))
+   `(help-key-binding ((t (:foreground ,ayako :background ,surface :box (:line-width 1 :color ,muted)))))
+   `(dired-directory ((t (:foreground ,tokiyuki))))
+   `(dired-symlink ((t (:foreground ,shizuku))))
+   `(dired-broken-symlink ((t (:foreground ,miko :underline t))))
+   `(dired-marked ((t (:foreground ,ayako :weight bold))))
+   `(dired-flagged ((t (:foreground ,miko :weight bold))))
+   `(dired-header ((t (:foreground ,ayako :weight bold))))
+   `(dired-ignored ((t (:foreground ,muted))))
+   `(dired-mark ((t (:foreground ,ayako :weight bold))))
+   `(dired-warning ((t (:foreground ,mima :weight bold))))
+   `(dired-perm-write ((t (:foreground ,mima))))
+   `(dired-set-id ((t (:foreground ,shizuku :weight bold))))
+   `(dired-special ((t (:foreground ,yorishige))))
 
-  ;; --- flymake -------------------------------------------------------
-  `(flymake-error ((t (:underline (:style wave :color ,miko)))))
-  `(flymake-warning ((t (:underline (:style wave :color ,mima)))))
-  `(flymake-note ((t (:underline (:style wave :color ,tokiyuki)))))
-  `(flymake-error-echo ((t (:foreground ,miko))))
-  `(flymake-warning-echo ((t (:foreground ,mima))))
-  `(flymake-note-echo ((t (:foreground ,tokiyuki))))
+   ;; --- flymake -------------------------------------------------------
+   `(flymake-error ((t (:underline (:style wave :color ,miko)))))
+   `(flymake-warning ((t (:underline (:style wave :color ,mima)))))
+   `(flymake-note ((t (:underline (:style wave :color ,tokiyuki)))))
+   `(flymake-error-echo ((t (:foreground ,miko))))
+   `(flymake-warning-echo ((t (:foreground ,mima))))
+   `(flymake-note-echo ((t (:foreground ,tokiyuki))))
 
-  ;; --- eldoc -----------------------------------------------------------
-  `(eldoc-highlight-function-argument ((t (:foreground ,ayako :weight bold))))
+   ;; --- eldoc -----------------------------------------------------------
+   `(eldoc-highlight-function-argument ((t (:foreground ,ayako :weight bold))))
 
-  ;; --- org-mode basics -------------------------------------------------
-  `(org-level-1 ((t (:foreground ,ayako :weight bold))))
-  `(org-level-2 ((t (:foreground ,mima :weight bold))))
-  `(org-level-3 ((t (:foreground ,yorishige :weight bold))))
-  `(org-level-4 ((t (:foreground ,shizuku :weight bold))))
-  `(org-level-5 ((t (:foreground ,tokiyuki :weight bold))))
-  `(org-level-6 ((t (:foreground ,miko :weight bold))))
-  `(org-document-title ((t (:foreground ,ayako :weight bold))))
-  `(org-document-info ((t (:foreground ,faint))))
-  `(org-block ((t (:background ,surface :foreground ,text))))
-  `(org-block-begin-line ((t (:background ,surface :foreground ,muted))))
-  `(org-block-end-line ((t (:background ,surface :foreground ,muted))))
-  `(org-code ((t (:foreground ,yorishige))))
-  `(org-verbatim ((t (:foreground ,shizuku))))
-  `(org-link ((t (:foreground ,tokiyuki :underline t))))
-  `(org-todo ((t (:background ,miko :foreground ,low :weight bold))))
-  `(org-done ((t (:background ,yorishige :foreground ,low :weight bold))))
-  `(org-headline-todo ((t (:foreground ,miko))))
-  `(org-headline-done ((t (:foreground ,yorishige))))
-  `(org-date ((t (:foreground ,muted :underline t))))
-  `(org-tag ((t (:foreground ,faint))))
-  `(org-special-keyword ((t (:foreground ,muted))))
-  `(org-quote ((t (:foreground ,faint :slant italic))))
-  `(org-macro ((t (:foreground ,mima))))
-  `(org-table ((t (:foreground ,ayako))))
-  `(org-footnote ((t :foreground ,shizuku :underline t)))
-  `(org-special-keyword ((t :foreground ,shizuku)))
-  ;; custom todo keywords
-  `(sailorfe-org-todo-next ((t (:background ,ayako :foreground ,low :weight bold))))
-  `(sailorfe-org-todo-prog ((t (:background ,shizuku :foreground ,low :weight bold))))
-  `(sailorfe-org-todo-wait ((t (:background ,tokiyuki :foreground ,low :weight bold))))
-  `(sailorfe-org-todo-void ((t (:background ,high :foreground ,low :weight bold :strikethrough t))))
+   ;; --- org-mode basics -------------------------------------------------
+   `(org-level-1 ((t (:foreground ,ayako :weight bold))))
+   `(org-level-2 ((t (:foreground ,mima :weight bold))))
+   `(org-level-3 ((t (:foreground ,yorishige :weight bold))))
+   `(org-level-4 ((t (:foreground ,shizuku :weight bold))))
+   `(org-level-5 ((t (:foreground ,tokiyuki :weight bold))))
+   `(org-level-6 ((t (:foreground ,miko :weight bold))))
+   `(org-document-title ((t (:foreground ,ayako :weight bold))))
+   `(org-document-info ((t (:foreground ,faint))))
+   `(org-block ((t (:background ,surface :foreground ,text))))
+   `(org-block-begin-line ((t (:background ,surface :foreground ,muted))))
+   `(org-block-end-line ((t (:background ,surface :foreground ,muted))))
+   `(org-code ((t (:foreground ,yorishige))))
+   `(org-verbatim ((t (:foreground ,shizuku))))
+   `(org-link ((t (:foreground ,tokiyuki :underline t))))
+   `(org-todo ((t (:background ,miko :foreground ,low :weight bold))))
+   `(org-done ((t (:background ,yorishige :foreground ,low :weight bold))))
+   `(org-headline-todo ((t (:foreground ,miko))))
+   `(org-headline-done ((t (:foreground ,yorishige))))
+   `(org-date ((t (:foreground ,muted :underline t))))
+   `(org-tag ((t (:foreground ,faint))))
+   `(org-special-keyword ((t (:foreground ,muted))))
+   `(org-quote ((t (:foreground ,faint :slant italic))))
+   `(org-macro ((t (:foreground ,mima))))
+   `(org-table ((t (:foreground ,ayako))))
+   `(org-footnote ((t :foreground ,shizuku :underline t)))
+   `(org-special-keyword ((t :foreground ,shizuku)))
+   ;; custom todo keywords
+   `(sailorfe-org-todo-next ((t (:background ,ayako :foreground ,low :weight bold))))
+   `(sailorfe-org-todo-prog ((t (:background ,shizuku :foreground ,low :weight bold))))
+   `(sailorfe-org-todo-wait ((t (:background ,tokiyuki :foreground ,low :weight bold))))
+   `(sailorfe-org-todo-void ((t (:background ,high :foreground ,low :weight bold :strikethrough t))))
 
-  ;; --- org-agenda -------------------------------------------------------
-  `(org-agenda-structure ((t (:foreground ,ayako :weight bold))))
-  `(org-agenda-date ((t (:foreground ,tokiyuki))))
-  `(org-agenda-date-weekend ((t (:foreground ,faint))))
-  `(org-agenda-date-today ((t (:foreground ,ayako :weight bold :underline t))))
-  `(org-agenda-current-time ((t (:foreground ,mima))))
-  `(org-agenda-clocking ((t (:background ,med))))
-  `(org-agenda-done ((t (:foreground ,yorishige))))
-  `(org-agenda-dimmed-todo-face ((t (:foreground ,muted))))
-  `(org-agenda-restriction-lock ((t (:background ,overlay))))
-  `(org-agenda-filter-tags ((t (:foreground ,shizuku))))
-  `(org-time-grid ((t (:foreground ,muted))))
-  `(org-scheduled ((t (:foreground ,text))))
-  `(org-scheduled-today ((t (:foreground ,ayako))))
-  `(org-scheduled-previously ((t (:foreground ,mima))))
-  `(org-upcoming-deadline ((t (:foreground ,mima))))
-  `(org-upcoming-distant-deadline ((t (:foreground ,faint))))
-  `(org-imminent-deadline ((t (:foreground ,miko :weight bold))))
-  `(org-warning ((t (:foreground ,miko :weight bold))))
-  `(org-priority ((t (:foreground ,shizuku))))
-  `(org-column ((t (:background ,surface))))
-  `(org-column-title ((t (:background ,surface :foreground ,ayako :weight bold))))
+   ;; --- org-agenda -------------------------------------------------------
+   `(org-agenda-structure ((t (:foreground ,ayako :weight bold))))
+   `(org-agenda-date ((t (:foreground ,tokiyuki))))
+   `(org-agenda-date-weekend ((t (:foreground ,faint))))
+   `(org-agenda-date-today ((t (:foreground ,ayako :weight bold :underline t))))
+   `(org-agenda-current-time ((t (:foreground ,mima))))
+   `(org-agenda-clocking ((t (:background ,med))))
+   `(org-agenda-done ((t (:foreground ,yorishige))))
+   `(org-agenda-dimmed-todo-face ((t (:foreground ,muted))))
+   `(org-agenda-restriction-lock ((t (:background ,overlay))))
+   `(org-agenda-filter-tags ((t (:foreground ,shizuku))))
+   `(org-time-grid ((t (:foreground ,muted))))
+   `(org-scheduled ((t (:foreground ,text))))
+   `(org-scheduled-today ((t (:foreground ,ayako))))
+   `(org-scheduled-previously ((t (:foreground ,mima))))
+   `(org-upcoming-deadline ((t (:foreground ,mima))))
+   `(org-upcoming-distant-deadline ((t (:foreground ,faint))))
+   `(org-imminent-deadline ((t (:foreground ,miko :weight bold))))
+   `(org-warning ((t (:foreground ,miko :weight bold))))
+   `(org-priority ((t (:foreground ,shizuku))))
+   `(org-column ((t (:background ,surface))))
+   `(org-column-title ((t (:background ,surface :foreground ,ayako :weight bold))))
 
-  ;; --- eww ---------------------------------------------------------------
-  `(eww-form-file ((t (:foreground ,base :background ,faint :box nil))))
-  `(eww-form-submit ((t (:foreground ,base :background ,faint :box nil))))
-  `(eww-form-text ((t (:foreground ,base :background ,text :box nil))))
-  `(eww-form-select ((t (:foreground ,base :background ,shizuku :box nil))))
-  `(eww-form-checkbox ((t (:foreground ,base :background ,shizuku :box nil))))
-  `(eww-form-textarea ((t (:foreground ,base :background ,text :box nil))))
-  `(eww-invalid-certificate ((t :foreground ,miko :weight bold)))
-  `(eww-valid-certificate ((t :foreground ,yorishige :weight bold)))
+   ;; --- eww ---------------------------------------------------------------
+   `(eww-form-file ((t (:foreground ,base :background ,faint :box nil))))
+   `(eww-form-submit ((t (:foreground ,base :background ,faint :box nil))))
+   `(eww-form-text ((t (:foreground ,base :background ,text :box nil))))
+   `(eww-form-select ((t (:foreground ,base :background ,shizuku :box nil))))
+   `(eww-form-checkbox ((t (:foreground ,base :background ,shizuku :box nil))))
+   `(eww-form-textarea ((t (:foreground ,base :background ,text :box nil))))
+   `(eww-invalid-certificate ((t :foreground ,miko :weight bold)))
+   `(eww-valid-certificate ((t :foreground ,yorishige :weight bold)))
 
-  ;; =====================================================================
-  ;; external packages
-  ;; =====================================================================
+   ;; =====================================================================
+   ;; external packages
+   ;; =====================================================================
 
-  ;; --- diff-hl -----------------------------------------------------------
-  `(diff-hl-insert ((t (:foreground ,yorishige))))
-  `(diff-hl-delete ((t (:foreground ,miko))))
-  `(diff-hl-change ((t (:foreground ,ayako))))
+   ;; --- diff-hl -----------------------------------------------------------
+   `(diff-hl-insert ((t (:foreground ,yorishige))))
+   `(diff-hl-delete ((t (:foreground ,miko))))
+   `(diff-hl-change ((t (:foreground ,ayako))))
 
-  ;; --- diredfl -------------------------------------------------------
-  `(diredfl-dir-heading ((t (:foreground ,ayako :weight bold))))
-  `(diredfl-dir-name ((t (:foreground ,tokiyuki))))
-  `(diredfl-dir-priv ((t (:foreground ,tokiyuki))))
-  `(diredfl-file-name ((t (:foreground ,text))))
-  `(diredfl-file-suffix ((t (:foreground ,faint))))
-  `(diredfl-symlink ((t (:foreground ,shizuku))))
-  `(diredfl-number ((t (:foreground ,mima))))
-  `(diredfl-date-time ((t (:foreground ,faint))))
-  `(diredfl-deletion ((t (:foreground ,miko :weight bold))))
-  `(diredfl-deletion-file-name ((t (:foreground ,miko :strike-through t))))
-  `(diredfl-flag-mark ((t (:foreground ,ayako :weight bold :background ,overlay))))
-  `(diredfl-flag-mark-line ((t (:background ,overlay))))
-  `(diredfl-ignored-file-name ((t (:foreground ,muted))))
-  `(diredfl-compressed-file-suffix ((t (:foreground ,shizuku))))
-  `(diredfl-compressed-file-name ((t (:foreground ,text))))
-  `(diredfl-executable-flag ((t (:foreground ,yorishige :weight bold))))
-  `(diredfl-read-priv ((t (:foreground ,mima))))
-  `(diredfl-write-priv ((t (:foreground ,mima))))
-  `(diredfl-exec-priv ((t (:foreground ,yorishige))))
-  `(diredfl-no-priv ((t (:foreground ,muted))))
-  `(diredfl-rare-priv ((t (:foreground ,shizuku :weight bold))))
-  `(diredfl-link-priv ((t (:foreground ,shizuku))))
-  `(diredfl-autofile-name ((t (:foreground ,faint :slant italic))))
-  `(diredfl-tagged-autofile-name ((t (:foreground ,ayako :slant italic))))
+   ;; --- diredfl -------------------------------------------------------
+   `(diredfl-dir-heading ((t (:foreground ,ayako :weight bold))))
+   `(diredfl-dir-name ((t (:foreground ,tokiyuki))))
+   `(diredfl-dir-priv ((t (:foreground ,tokiyuki))))
+   `(diredfl-file-name ((t (:foreground ,text))))
+   `(diredfl-file-suffix ((t (:foreground ,faint))))
+   `(diredfl-symlink ((t (:foreground ,shizuku))))
+   `(diredfl-number ((t (:foreground ,mima))))
+   `(diredfl-date-time ((t (:foreground ,faint))))
+   `(diredfl-deletion ((t (:foreground ,miko :weight bold))))
+   `(diredfl-deletion-file-name ((t (:foreground ,miko :strike-through t))))
+   `(diredfl-flag-mark ((t (:foreground ,ayako :weight bold :background ,overlay))))
+   `(diredfl-flag-mark-line ((t (:background ,overlay))))
+   `(diredfl-ignored-file-name ((t (:foreground ,muted))))
+   `(diredfl-compressed-file-suffix ((t (:foreground ,shizuku))))
+   `(diredfl-compressed-file-name ((t (:foreground ,text))))
+   `(diredfl-executable-flag ((t (:foreground ,yorishige :weight bold))))
+   `(diredfl-read-priv ((t (:foreground ,mima))))
+   `(diredfl-write-priv ((t (:foreground ,mima))))
+   `(diredfl-exec-priv ((t (:foreground ,yorishige))))
+   `(diredfl-no-priv ((t (:foreground ,muted))))
+   `(diredfl-rare-priv ((t (:foreground ,shizuku :weight bold))))
+   `(diredfl-link-priv ((t (:foreground ,shizuku))))
+   `(diredfl-autofile-name ((t (:foreground ,faint :slant italic))))
+   `(diredfl-tagged-autofile-name ((t (:foreground ,ayako :slant italic))))
 
-  ;; --- flycheck --------------------------------------------------------
-  `(flycheck-error ((t (:underline (:style wave :color ,miko)))))
-  `(flycheck-warning ((t (:underline (:style wave :color ,mima)))))
-  `(flycheck-info ((t (:underline (:style wave :color ,tokiyuki)))))
-  `(flycheck-fringe-error ((t (:foreground ,miko :weight bold))))
-  `(flycheck-fringe-warning ((t (:foreground ,mima :weight bold))))
-  `(flycheck-fringe-info ((t (:foreground ,tokiyuki :weight bold))))
-  `(flycheck-error-list-error ((t (:foreground ,miko :weight bold))))
-  `(flycheck-error-list-warning ((t (:foreground ,mima :weight bold))))
-  `(flycheck-error-list-info ((t (:foreground ,tokiyuki))))
+   ;; --- flycheck --------------------------------------------------------
+   `(flycheck-error ((t (:underline (:style wave :color ,miko)))))
+   `(flycheck-warning ((t (:underline (:style wave :color ,mima)))))
+   `(flycheck-info ((t (:underline (:style wave :color ,tokiyuki)))))
+   `(flycheck-fringe-error ((t (:foreground ,miko :weight bold))))
+   `(flycheck-fringe-warning ((t (:foreground ,mima :weight bold))))
+   `(flycheck-fringe-info ((t (:foreground ,tokiyuki :weight bold))))
+   `(flycheck-error-list-error ((t (:foreground ,miko :weight bold))))
+   `(flycheck-error-list-warning ((t (:foreground ,mima :weight bold))))
+   `(flycheck-error-list-info ((t (:foreground ,tokiyuki))))
 
-  ;; --- jinx ------------------------------------------------------------
-  `(jinx-misspelled ((t (:foreground ,miko :underline (:style wave :color ,miko)))))
-  `(jinx-highlight ((t (:foreground ,base :background ,mima))))
+   ;; --- jinx ------------------------------------------------------------
+   `(jinx-misspelled ((t (:foreground ,miko :underline (:style wave :color ,miko)))))
+   `(jinx-highlight ((t (:foreground ,base :background ,mima))))
 
-  ;; --- eldoc-box -------------------------------------------------------
-  `(eldoc-box-body ((t (:background ,surface :foreground ,text))))
-  `(eldoc-box-border ((t (:background ,muted))))
+   ;; --- eldoc-box -------------------------------------------------------
+   `(eldoc-box-body ((t (:background ,surface :foreground ,text))))
+   `(eldoc-box-border ((t (:background ,muted))))
 
-  ;; --- markdown-mode -------------------------------------------------
-  `(markdown-header-face ((t (:foreground ,ayako :weight bold))))
-  `(markdown-header-face-1 ((t (:foreground ,ayako :weight bold))))
-  `(markdown-header-face-2 ((t (:foreground ,mima :weight bold))))
-  `(markdown-header-face-3 ((t (:foreground ,yorishige :weight bold))))
-  `(markdown-header-face-4 ((t (:foreground ,shizuku :weight bold))))
-  `(markdown-header-face-5 ((t (:foreground ,tokiyuki :weight bold))))
-  `(markdown-header-face-6 ((t (:foreground ,miko :weight bold))))
-  `(markdown-header-delimiter-face ((t (:foreground ,muted))))
-  `(markdown-link-face ((t (:foreground ,tokiyuki :underline t))))
-  `(markdown-url-face ((t (:foreground ,tokiyuki :slant italic :underline t))))
-  `(markdown-code-face ((t (:foreground ,yorishige))))
-  `(markdown-inline-code-face ((t (:foreground ,yorishige))))
-  `(markdown-blockquote-face ((t (:foreground ,faint :slant italic))))
-  `(markdown-list-face ((t (:foreground ,mima))))
-  `(markdown-bold-face ((t (:weight bold))))
-  `(markdown-italic-face ((t (:slant italic))))
-  `(markdown-strike-through-face ((t (:strike-through t :foreground ,muted))))
-  `(markdown-markup-face ((t (:foreground ,muted))))
+   ;; --- markdown-mode -------------------------------------------------
+   `(markdown-header-face ((t (:foreground ,ayako :weight bold))))
+   `(markdown-header-face-1 ((t (:foreground ,ayako :weight bold))))
+   `(markdown-header-face-2 ((t (:foreground ,mima :weight bold))))
+   `(markdown-header-face-3 ((t (:foreground ,yorishige :weight bold))))
+   `(markdown-header-face-4 ((t (:foreground ,shizuku :weight bold))))
+   `(markdown-header-face-5 ((t (:foreground ,tokiyuki :weight bold))))
+   `(markdown-header-face-6 ((t (:foreground ,miko :weight bold))))
+   `(markdown-header-delimiter-face ((t (:foreground ,muted))))
+   `(markdown-link-face ((t (:foreground ,tokiyuki :underline t))))
+   `(markdown-url-face ((t (:foreground ,tokiyuki :slant italic :underline t))))
+   `(markdown-code-face ((t (:foreground ,yorishige))))
+   `(markdown-inline-code-face ((t (:foreground ,yorishige))))
+   `(markdown-blockquote-face ((t (:foreground ,faint :slant italic))))
+   `(markdown-list-face ((t (:foreground ,mima))))
+   `(markdown-bold-face ((t (:weight bold))))
+   `(markdown-italic-face ((t (:slant italic))))
+   `(markdown-strike-through-face ((t (:strike-through t :foreground ,muted))))
+   `(markdown-markup-face ((t (:foreground ,muted))))
 
-  ;; --- magit / transient -------------------------------------------------
+   ;; --- magit / transient -------------------------------------------------
 
-  ;; sections / headers
-  `(magit-section-heading ((t (:foreground ,ayako :weight bold))))
-  `(magit-section-heading-selection ((t (:background ,overlay :foreground ,ayako :weight bold))))
-  `(magit-section-highlight ((t (:background ,surface))))
+   ;; sections / headers
+   `(magit-section-heading ((t (:foreground ,ayako :weight bold))))
+   `(magit-section-heading-selection ((t (:background ,overlay :foreground ,ayako :weight bold))))
+   `(magit-section-highlight ((t (:background ,surface))))
 
-  ;; popup / transient interface
-  `(transient-heading ((t (:foreground ,ayako :weight bold))))
-  `(transient-key ((t (:foreground ,tokiyuki :weight bold))))
-  `(transient-argument ((t (:foreground ,yorishige))))
-  `(transient-value ((t (:foreground ,mima))))
-  `(transient-inactive-argument ((t (:foreground ,muted))))
-  `(transient-inactive-value ((t (:foreground ,muted))))
+   ;; popup / transient interface
+   `(transient-heading ((t (:foreground ,ayako :weight bold))))
+   `(transient-key ((t (:foreground ,tokiyuki :weight bold))))
+   `(transient-argument ((t (:foreground ,yorishige))))
+   `(transient-value ((t (:foreground ,mima))))
+   `(transient-inactive-argument ((t (:foreground ,muted))))
+   `(transient-inactive-value ((t (:foreground ,muted))))
 
-  ;; branch / refs
-  `(magit-branch-local ((t (:foreground ,yorishige :weight bold))))
-  `(magit-branch-remote ((t (:foreground ,tokiyuki :weight bold))))
-  `(magit-branch-current ((t (:foreground ,ayako :weight bold))))
-  `(magit-branch-upstream ((t (:foreground ,mima))))
-  `(magit-head ((t (:foreground ,ayako :weight bold))))
+   ;; branch / refs
+   `(magit-branch-local ((t (:foreground ,yorishige :weight bold))))
+   `(magit-branch-remote ((t (:foreground ,tokiyuki :weight bold))))
+   `(magit-branch-current ((t (:foreground ,ayako :weight bold))))
+   `(magit-branch-upstream ((t (:foreground ,mima))))
+   `(magit-head ((t (:foreground ,ayako :weight bold))))
 
-  `(magit-tag ((t (:foreground ,shizuku :weight bold))))
+   `(magit-tag ((t (:foreground ,shizuku :weight bold))))
 
-  ;; commit metadata
-  `(magit-log-author ((t (:foreground ,text))))
-  `(magit-log-date ((t (:foreground ,muted))))
-  `(magit-log-graph ((t (:foreground ,faint))))
-  `(magit-hash ((t (:foreground ,muted))))
-  `(magit-reflog-commit ((t (:foreground ,yorishige))))
-  `(magit-reflog-other ((t (:foreground ,tokiyuki))))
+   ;; commit metadata
+   `(magit-log-author ((t (:foreground ,text))))
+   `(magit-log-date ((t (:foreground ,muted))))
+   `(magit-log-graph ((t (:foreground ,faint))))
+   `(magit-hash ((t (:foreground ,muted))))
+   `(magit-reflog-commit ((t (:foreground ,yorishige))))
+   `(magit-reflog-other ((t (:foreground ,tokiyuki))))
 
-  ;; commit messages
-  `(magit-diff-file-heading ((t (:foreground ,ayako :weight bold))))
-  `(magit-diff-file-heading-highlight ((t (:background ,surface :foreground ,ayako :weight bold))))
-  `(magit-diff-file-heading-selection ((t (:background ,overlay :foreground ,light :weight bold))))
-  `(magit-diff-hunk-heading ((t (:background ,surface :foreground ,tokiyuki))))
-  `(magit-diff-hunk-heading-highlight ((t (:background ,overlay :foreground ,ayako))))
-  `(magit-diff-hunk-heading-selection ((t (:background ,overlay :foreground ,light))))
+   ;; commit messages
+   `(magit-diff-file-heading ((t (:foreground ,ayako :weight bold))))
+   `(magit-diff-file-heading-highlight ((t (:background ,surface :foreground ,ayako :weight bold))))
+   `(magit-diff-file-heading-selection ((t (:background ,overlay :foreground ,light :weight bold))))
+   `(magit-diff-hunk-heading ((t (:background ,surface :foreground ,tokiyuki))))
+   `(magit-diff-hunk-heading-highlight ((t (:background ,overlay :foreground ,ayako))))
+   `(magit-diff-hunk-heading-selection ((t (:background ,overlay :foreground ,light))))
 
-  ;; diff content
-  `(magit-diff-context ((t (:foreground ,faint))))
-  `(magit-diff-context-highlight ((t (:background ,surface :foreground ,text))))
+   ;; diff content
+   `(magit-diff-context ((t (:foreground ,faint))))
+   `(magit-diff-context-highlight ((t (:background ,surface :foreground ,text))))
 
-  `(magit-diff-added ((t (:foreground ,yorishige))))
-  `(magit-diff-added-highlight ((t (:background ,yorishige :foreground ,base))))
+   `(magit-diff-added ((t (:foreground ,yorishige))))
+   `(magit-diff-added-highlight ((t (:background ,yorishige :foreground ,base))))
 
-  `(magit-diff-removed ((t (:foreground ,miko))))
-  `(magit-diff-removed-highlight ((t (:background ,miko :foreground ,light))))
+   `(magit-diff-removed ((t (:foreground ,miko))))
+   `(magit-diff-removed-highlight ((t (:background ,miko :foreground ,light))))
 
-  `(magit-diff-added-highlight ((t (:background ,yorishige :foreground ,base))))
-  `(magit-diff-removed-highlight ((t (:background ,miko :foreground ,light))))
+   `(magit-diff-added-highlight ((t (:background ,yorishige :foreground ,base))))
+   `(magit-diff-removed-highlight ((t (:background ,miko :foreground ,light))))
 
-  `(magit-diff-whitespace-warning ((t (:background ,mima :foreground ,base))))
+   `(magit-diff-whitespace-warning ((t (:background ,mima :foreground ,base))))
 
-  ;; status buffer
-  `(magit-diffstat-added ((t (:foreground ,yorishige))))
-  `(magit-diffstat-removed ((t (:foreground ,miko))))
-  `(magit-diffstat-neutral ((t (:foreground ,muted))))
+   ;; status buffer
+   `(magit-diffstat-added ((t (:foreground ,yorishige))))
+   `(magit-diffstat-removed ((t (:foreground ,miko))))
+   `(magit-diffstat-neutral ((t (:foreground ,muted))))
 
-  `(magit-status-heading ((t (:foreground ,ayako :weight bold))))
-  `(magit-status-heading-key ((t (:foreground ,tokiyuki))))
-  `(magit-status-untracked ((t (:foreground ,shizuku))))
-  `(magit-status-ignored ((t (:foreground ,muted))))
-  `(magit-status-modified ((t (:foreground ,mima))))
-  `(magit-status-added ((t (:foreground ,yorishige))))
-  `(magit-status-renamed ((t (:foreground ,tokiyuki))))
-  `(magit-status-conflict ((t (:foreground ,miko :weight bold))))
+   `(magit-status-heading ((t (:foreground ,ayako :weight bold))))
+   `(magit-status-heading-key ((t (:foreground ,tokiyuki))))
+   `(magit-status-untracked ((t (:foreground ,shizuku))))
+   `(magit-status-ignored ((t (:foreground ,muted))))
+   `(magit-status-modified ((t (:foreground ,mima))))
+   `(magit-status-added ((t (:foreground ,yorishige))))
+   `(magit-status-renamed ((t (:foreground ,tokiyuki))))
+   `(magit-status-conflict ((t (:foreground ,miko :weight bold))))
 
-  ;; process / errors
-  `(magit-process-ok ((t (:foreground ,yorishige :weight bold))))
-  `(magit-process-ng ((t (:foreground ,miko :weight bold))))
+   ;; process / errors
+   `(magit-process-ok ((t (:foreground ,yorishige :weight bold))))
+   `(magit-process-ng ((t (:foreground ,miko :weight bold))))
 
-  ;; blame
-  `(magit-blame-heading ((t (:background ,surface :foreground ,text))))
-  `(magit-blame-highlight ((t (:background ,overlay))))
-  `(magit-blame-date ((t (:foreground ,muted))))
-  `(magit-blame-name ((t (:foreground ,ayako))))
+   ;; blame
+   `(magit-blame-heading ((t (:background ,surface :foreground ,text))))
+   `(magit-blame-highlight ((t (:background ,overlay))))
+   `(magit-blame-date ((t (:foreground ,muted))))
+   `(magit-blame-name ((t (:foreground ,ayako))))
 
-  ;; --- corfu ----------------------------------------------------------
-  `(corfu-default ((t (:background ,surface :foreground ,text))))
-  `(corfu-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
-  `(corfu-bar ((t (:background ,high))))
-  `(corfu-border ((t (:background ,muted))))
-  `(corfu-annotations ((t (:foreground ,muted :slant italic))))
-  `(corfu-deprecated ((t (:foreground ,muted :strike-through t))))
+   ;; --- corfu ----------------------------------------------------------
+   `(corfu-default ((t (:background ,surface :foreground ,text))))
+   `(corfu-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
+   `(corfu-bar ((t (:background ,high))))
+   `(corfu-border ((t (:background ,muted))))
+   `(corfu-annotations ((t (:foreground ,muted :slant italic))))
+   `(corfu-deprecated ((t (:foreground ,muted :strike-through t))))
 
-  ;; --- vertico / orderless ---------------------------------------------
-  `(vertico-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
-  `(vertico-group-title ((t (:foreground ,faint :weight bold))))
-  `(vertico-group-separator ((t (:foreground ,muted :strike-through t))))
-  `(vertico-mkamakuraline ((t (:foreground ,muted))))
-  `(orderless-match-face-0 ((t (:foreground ,ayako :weight bold))))
-  `(orderless-match-face-1 ((t (:foreground ,tokiyuki :weight bold))))
-  `(orderless-match-face-2 ((t (:foreground ,yorishige :weight bold))))
-  `(orderless-match-face-3 ((t (:foreground ,shizuku :weight bold))))
+   ;; --- vertico / orderless ---------------------------------------------
+   `(vertico-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
+   `(vertico-group-title ((t (:foreground ,faint :weight bold))))
+   `(vertico-group-separator ((t (:foreground ,muted :strike-through t))))
+   `(vertico-mkamakuraline ((t (:foreground ,muted))))
+   `(orderless-match-face-0 ((t (:foreground ,ayako :weight bold))))
+   `(orderless-match-face-1 ((t (:foreground ,tokiyuki :weight bold))))
+   `(orderless-match-face-2 ((t (:foreground ,yorishige :weight bold))))
+   `(orderless-match-face-3 ((t (:foreground ,shizuku :weight bold))))
 
-  ;; --- dashboard -------------------------------------------------------
-  `(dashboard-heading ((t (:foreground ,tokiyuki :weight bold))))
-  `(dashboard-navigator ((t (:foreground ,shizuku :weight bold))))
-  `(dashboard-items-face ((t (:foreground ,shizuku :weight bold))))
-  `(dashboard-no-items-face ((t (:foreground ,muted :weight bold))))
-  `(dashboard-footer-face ((t (:foreground ,faint :slant italic))))
-  `(dashboard-text-banner ((t (:foreground ,tokiyuki))))
-  `(dashboard-banner-logo-title ((t (:foreground ,text))))
+   ;; --- dashboard -------------------------------------------------------
+   `(dashboard-heading ((t (:foreground ,tokiyuki :weight bold))))
+   `(dashboard-navigator ((t (:foreground ,shizuku :weight bold))))
+   `(dashboard-items-face ((t (:foreground ,shizuku :weight bold))))
+   `(dashboard-no-items-face ((t (:foreground ,muted :weight bold))))
+   `(dashboard-footer-face ((t (:foreground ,faint :slant italic))))
+   `(dashboard-text-banner ((t (:foreground ,tokiyuki))))
+   `(dashboard-banner-logo-title ((t (:foreground ,text))))
 
-  ;; --- vterm -----------------------------------------------------------
-  `(vterm-color-black ((t (:foreground ,low :background ,low))))
-  `(vterm-color-bright-black ((t (:foreground ,med :background ,med))))
-  `(vterm-color-red ((t (:foreground ,miko :background ,miko))))
-  `(vterm-color-bright-red ((t (:foreground ,taisha :background ,taisha))))
-  `(vterm-color-green ((t (:foreground ,yorishige :background ,yorishige))))
-  `(vterm-color-bright-green ((t (:foreground ,suwa :background ,suwa))))
-  `(vterm-color-yellow ((t (:foreground ,mima :background ,mima))))
-  `(vterm-color-bright-yellow ((t (:foreground ,sasaki :background ,sasaki))))
-  `(vterm-color-blue ((t (:foreground ,tokiyuki :background ,tokiyuki))))
-  `(vterm-color-bright-blue ((t (:foreground ,hojo :background ,hojo))))
-  `(vterm-color-magenta ((t (:foreground ,ayako :background ,ayako))))
-  `(vterm-color-bright-magenta ((t (:foreground ,mochizuki :background ,mochizuki))))
-  `(vterm-color-cyan ((t (:foreground ,shizuku :background ,shizuku))))
-  `(vterm-color-bright-cyan ((t (:foreground ,kami :background ,kami))))
-  `(vterm-color-white ((t (:foreground ,text :background ,text))))
-  `(vterm-color-bright-white ((t (:foreground ,light :background ,light))))
-  `(vterm-color-underline ((t (:foreground ,shizuku))))
-  `(vterm-color-inverse-video ((t (:background ,base :inverse-video t))))
-  ))
+   ;; --- vterm -----------------------------------------------------------
+   `(vterm-color-black ((t (:foreground ,low :background ,low))))
+   `(vterm-color-bright-black ((t (:foreground ,med :background ,med))))
+   `(vterm-color-red ((t (:foreground ,miko :background ,miko))))
+   `(vterm-color-bright-red ((t (:foreground ,taisha :background ,taisha))))
+   `(vterm-color-green ((t (:foreground ,yorishige :background ,yorishige))))
+   `(vterm-color-bright-green ((t (:foreground ,suwa :background ,suwa))))
+   `(vterm-color-yellow ((t (:foreground ,mima :background ,mima))))
+   `(vterm-color-bright-yellow ((t (:foreground ,sasaki :background ,sasaki))))
+   `(vterm-color-blue ((t (:foreground ,tokiyuki :background ,tokiyuki))))
+   `(vterm-color-bright-blue ((t (:foreground ,hojo :background ,hojo))))
+   `(vterm-color-magenta ((t (:foreground ,ayako :background ,ayako))))
+   `(vterm-color-bright-magenta ((t (:foreground ,mochizuki :background ,mochizuki))))
+   `(vterm-color-cyan ((t (:foreground ,shizuku :background ,shizuku))))
+   `(vterm-color-bright-cyan ((t (:foreground ,kami :background ,kami))))
+   `(vterm-color-white ((t (:foreground ,text :background ,text))))
+   `(vterm-color-bright-white ((t (:foreground ,light :background ,light))))
+   `(vterm-color-underline ((t (:foreground ,shizuku))))
+   `(vterm-color-inverse-video ((t (:background ,base :inverse-video t))))
+   ))
 
 ;;;###autoload
 (when (and (boundp 'custom-theme-load-path) load-file-name)
