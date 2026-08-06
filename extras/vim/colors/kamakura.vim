@@ -37,7 +37,7 @@ hi WildMenu     guifg=#f9f3e0 guibg=#5d4c3b ctermfg=230 ctermbg=239
 hi StatusLine       term=bold cterm=bold guifg=#413324 guibg=#f8efd2 ctermfg=236 ctermbg=230
 hi StatusLineNC     term=bold cterm=bold guifg=#a99b88 guibg=#f9f3e0 ctermfg=138 ctermbg=230
 hi StatusLineTerm   term=bold cterm=bold ctermfg=230 guibg=#37892d ctermbg=64
-hi StatusLineTermNC term=bold cterm=bold ctermfg=230 guibg=#5fad56 ctermbg=71
+hi StatusLineTermNC term=bold cterm=bold ctermfg=230 guibg=#127d06 ctermbg=28
 hi VertSplit        guifg=#f8efd2 guibg=#f9f3e0 ctermfg=230 ctermbg=230
 hi TabLine          guifg=#a99b88 guibg=#f8efd2 ctermfg=138 ctermbg=230
 hi TabLineSel       guifg=#413324 guibg=#f9e6c2 ctermfg=236 ctermbg=223
@@ -89,8 +89,8 @@ hi SpellRare    guifg=#937abc ctermfg=103 gui=underline
 let g:terminal_ansi_colors = [
       \ '#ede9dd', '#aa172a', '#37892d', '#cd9e1d',
       \ '#937abc', '#dd6d76', '#297f88', '#5d4c3b',
-      \ '#dcd4c5', '#ca4455', '#5fad56', '#e2b63a',
-      \ '#af9ccd', '#e7979d', '#55a1a9', '#413324'
+      \ '#dcd4c5', '#8e0013', '#127d06', '#a9800d',
+      \ '#7b659e', '#c94f59', '#00727f', '#413324'
       \ ]
 
 let g:terminal_color_0  = '#ede9dd'
@@ -102,10 +102,10 @@ let g:terminal_color_5  = '#dd6d76'
 let g:terminal_color_6  = '#297f88'
 let g:terminal_color_7  = '#5d4c3b'
 let g:terminal_color_8  = '#dcd4c5'
-let g:terminal_color_9  = '#ca4455'
-let g:terminal_color_10 = '#5fad56'
-let g:terminal_color_11 = '#e2b63a'
-let g:terminal_color_12 = '#af9ccd'
-let g:terminal_color_13 = '#e7979d'
-let g:terminal_color_14 = '#55a1a9'
+let g:terminal_color_9  = '#8e0013'
+let g:terminal_color_10 = '#127d06'
+let g:terminal_color_11 = '#a9800d'
+let g:terminal_color_12 = '#7b659e'
+let g:terminal_color_13 = '#c94f59'
+let g:terminal_color_14 = '#00727f'
 let g:terminal_color_15 = '#413324'

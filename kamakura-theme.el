@@ -94,13 +94,13 @@ DH, DS and DL are optional deltas added to H, S and L before conversion."
     (ayako     355 0.63 0.65)   ; pink
     (shizuku   186 0.53 0.35)   ; turquoise
 
-    ;; brights for terminals
-    (taisha    miko      0.0 -0.2  0.15)
-    (suwa      yorishige 0.0 -0.15 0.15)
-    (sasaki    mima      0.0  0.0  0.1)
-    (hojo      tokiyuki  0.0  0.0  0.1)
-    (mochizuki ayako     0.0  0.0  0.1)
-    (kami      shizuku   0.0 -0.2  0.15)))
+    ;; terminal alt
+    (taisha    miko      0.0  0.8  -0.1)
+    (suwa      yorishige 0.0  0.4  -0.1)
+    (sasaki    mima      0.0  0.1  -0.1)
+    (hojo      tokiyuki  0.0 -0.1  -0.1)
+    (mochizuki ayako     0.0 -0.1  -0.1)
+    (kami      shizuku   0.0  0.6  -0.1)))
 
 (defun kamakura/build-palette ()
   "Derive the full hex palette from `palette-spec'.
@@ -396,8 +396,8 @@ Both are names from `palette-spec'; AGAINST defaults to `base'."
    `(org-code ((t (:foreground ,yorishige))))
    `(org-verbatim ((t (:foreground ,shizuku))))
    `(org-link ((t (:foreground ,tokiyuki :underline t))))
-   `(org-todo ((t (:background ,miko :foreground ,low :weight bold))))
-   `(org-done ((t (:background ,yorishige :foreground ,low :weight bold))))
+   `(org-todo ((t (:background ,overlay :foreground ,miko :weight bold))))
+   `(org-done ((t (:background ,overlay :foreground ,yorishige :weight bold))))
    `(org-headline-todo ((t (:foreground ,miko))))
    `(org-headline-done ((t (:foreground ,yorishige))))
    `(org-date ((t (:foreground ,muted :underline t))))
@@ -409,10 +409,10 @@ Both are names from `palette-spec'; AGAINST defaults to `base'."
    `(org-footnote ((t :foreground ,shizuku :underline t)))
    `(org-special-keyword ((t :foreground ,shizuku)))
    ;; custom todo keywords
-   `(sailorfe-org-todo-next ((t (:background ,ayako :foreground ,low :weight bold))))
-   `(sailorfe-org-todo-prog ((t (:background ,shizuku :foreground ,low :weight bold))))
-   `(sailorfe-org-todo-wait ((t (:background ,tokiyuki :foreground ,low :weight bold))))
-   `(sailorfe-org-todo-void ((t (:background ,high :foreground ,low :weight bold :strikethrough t))))
+   `(sailorfe-org-todo-next ((t (:background ,overlay :foreground ,ayako :weight bold))))
+   `(sailorfe-org-todo-prog ((t (:background ,overlay :foreground ,shizuku :weight bold))))
+   `(sailorfe-org-todo-wait ((t (:background ,overlay :foreground ,tokiyuki :weight bold))))
+   `(sailorfe-org-todo-void ((t (:background ,overlay :foreground ,muted :weight bold :strikethrough t))))
 
    ;; --- org-agenda -------------------------------------------------------
    `(org-agenda-structure ((t (:foreground ,ayako :weight bold))))
