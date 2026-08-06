@@ -482,6 +482,7 @@ https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell#use-case--size-ran
    `(org-date ((t (:foreground ,muted :underline t))))
    `(org-tag ((t (:foreground ,faint))))
    `(org-special-keyword ((t (:foreground ,muted))))
+   `(org-drawer ((t (:foreground ,shizuku))))
    `(org-quote ((t (:foreground ,faint :slant italic))))
    `(org-macro ((t (:foreground ,mima))))
    `(org-table ((t (:foreground ,ayako))))
@@ -525,6 +526,16 @@ https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell#use-case--size-ran
    `(eww-form-textarea ((t (:foreground ,base :background ,text :box nil))))
    `(eww-invalid-certificate ((t :foreground ,miko :weight bold)))
    `(eww-valid-certificate ((t :foreground ,yorishige :weight bold)))
+
+   ;; --- smerge --------------------------------------------------------
+   ;; currently dogfooding
+   `(smerge-mine ((t (:background ,surface :foreground ,miko :extend t))))
+   `(smerge-other ((t (:background ,surface :foreground ,yorishige :extend t))))
+   `(smerge-base ((t (:background ,surface :foreground ,tokiyuki :extend t))))
+   `(smerge-markers ((t (:background ,overlay :foreground ,light) :weight bold :extend t)))
+   `(smerge-refined-added ((t (:background ,low :foreground ,yorishige))))
+   `(smerge-refined-removed ((t (:background ,low :foreground ,miko))))
+   `(smerge-refined-changed ((t (:background ,low :foreground ,tokiyuki))))
 
    ;; =====================================================================
    ;; external packages
@@ -687,23 +698,25 @@ https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell#use-case--size-ran
    `(corfu-annotations ((t (:foreground ,muted :slant italic))))
    `(corfu-deprecated ((t (:foreground ,muted :strike-through t))))
 
-   ;; --- vertico / orderless ---------------------------------------------
+   ;; --- vertico ---------------------------------------------------------
    `(vertico-current ((t (:background ,overlay :foreground ,ayako :weight bold))))
    `(vertico-group-title ((t (:foreground ,faint :weight bold))))
    `(vertico-group-separator ((t (:foreground ,muted :strike-through t))))
    `(vertico-mkamakuraline ((t (:foreground ,muted))))
+
+   ;; --- orderless ------------------------------------------------------
    `(orderless-match-face-0 ((t (:foreground ,ayako :weight bold))))
    `(orderless-match-face-1 ((t (:foreground ,tokiyuki :weight bold))))
    `(orderless-match-face-2 ((t (:foreground ,yorishige :weight bold))))
    `(orderless-match-face-3 ((t (:foreground ,shizuku :weight bold))))
 
    ;; --- dashboard -------------------------------------------------------
-   `(dashboard-heading ((t (:foreground ,tokiyuki :weight bold))))
-   `(dashboard-navigator ((t (:foreground ,shizuku :weight bold))))
-   `(dashboard-items-face ((t (:foreground ,shizuku :weight bold))))
+   `(dashboard-heading ((t (:foreground ,ayako :weight bold))))
+   `(dashboard-navigator ((t (:foreground ,tokiyuki :weight bold))))
+   `(dashboard-items-face ((t (:foreground ,tokiyuki :weight bold))))
    `(dashboard-no-items-face ((t (:foreground ,muted :weight bold))))
    `(dashboard-footer-face ((t (:foreground ,faint :slant italic))))
-   `(dashboard-text-banner ((t (:foreground ,tokiyuki))))
+   `(dashboard-text-banner ((t (:foreground ,ayako))))
    `(dashboard-banner-logo-title ((t (:foreground ,text))))
 
    ;; --- vterm -----------------------------------------------------------
