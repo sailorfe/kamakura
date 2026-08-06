@@ -103,8 +103,8 @@ DH, DS and DL are optional deltas added to H, S and L before conversion."
     (kami      shizuku   0.0  0.6  -0.1)))
 
 (defun kamakura/build-palette ()
-  "Derive the full hex palette from `palette-spec'.
-Returns an alist of hex colors, a `NAME-rgb' comma-separated RGB string for each, and a `NAME-cterm' nearest-256 index for each."
+  "Derive the full hex palette from 'palette-spec'.
+Returns an alist of hex colors, a 'NAME-rgb' comma-separated RGB string for each, and a 'NAME-cterm' nearest-256 index for each."
   (let (hsl-table hex)
     (dolist (spec kamakura/palette-spec)
       (pcase spec
@@ -140,10 +140,9 @@ Returns an alist of hex colors, a `NAME-rgb' comma-separated RGB string for each
     `(let* ,(mapcar (lambda (n) (list n `(alist-get ',n kamakura/palette))) names)
        ,@body)))
 
-;;; --- contrast auditing ---------------------------------------------------
-;; Dev tools, not part of theme load. only operate on palette values, so unaware of faces.
+;;; --- WCAG 2.0 contrast auditing --------------------------------------
 
-(defun kamakura/relative-luminance (hex)
+(defun kamakura/wcag-relative-luminance (hex)
   "Return the WCAG relative luminance of HEX (a \"#rrggbb\" string), in [0, 1]."
   (cl-flet ((linearize (v)
               (let ((c (/ v 255.0)))
@@ -154,23 +153,23 @@ Returns an alist of hex colors, a `NAME-rgb' comma-separated RGB string for each
        (* 0.7152 (linearize (string-to-number (substring hex 3 5) 16)))
        (* 0.0722 (linearize (string-to-number (substring hex 5 7) 16))))))
 
-(defun kamakura/contrast-ratio (a b)
+(defun kamakura/wcag-contrast-ratio (a b)
   "Return the WCAG contrast ratio between hex colors A and B, in [1, 21]."
-  (let ((la (kamakura/relative-luminance a))
-        (lb (kamakura/relative-luminance b)))
+  (let ((la (kamakura/wcag-relative-luminance a))
+        (lb (kamakura/wcag-relative-luminance b)))
     (/ (+ (max la lb) 0.05)
        (+ (min la lb) 0.05))))
 
-(defun kamakura/contrast (name &optional against)
+(defun kamakura/wcag-contrast (name &optional against)
   "Report the WCAG contrast ratio of palette color NAME against AGAINST.
-Both are names from `palette-spec'; AGAINST defaults to `base'."
+Both are names from 'palette-spec'; AGAINST defaults to 'base'."
   (interactive
    (let ((names (mapcar #'car kamakura/palette-spec)))
      (list (intern (completing-read "Color: " names))
            (intern (completing-read "Against (default base): " names nil nil nil nil "base")))))
   (let* ((against (or against 'base))
-         (ratio (kamakura/contrast-ratio (alist-get name kamakura/palette)
-                                         (alist-get against kamakura/palette))))
+         (ratio (kamakura/wcag-contrast-ratio (alist-get name kamakura/palette)
+                                              (alist-get against kamakura/palette))))
     (when (called-interactively-p 'any)
       (message "%s vs %s: %.2f:1  (AA text %s, AA large-text/UI %s)"
                name against ratio
@@ -178,8 +177,11 @@ Both are names from `palette-spec'; AGAINST defaults to `base'."
                (if (>= ratio 3.0) "pass" "fail")))
     ratio))
 
-(defun kamakura/audit-contrast (&optional against)
-  "Print the WCAG contrast ratio of every palette color against AGAINST.  AGAINST defaults to `base'."
+;;; --- APCA contrast auditing ------------------------------------------
+;; https://git.apcacontrast.com/documentation/APCAeasyIntro
+
+(defun kamakura/wcag-audit-contrast (&optional against)
+  "Print the WCAG contrast ratio of every palette color against AGAINST.  AGAINST defaults to 'base'."
   (interactive
    (list (intern (completing-read "Against (default base): "
                                   (mapcar #'car kamakura/palette-spec)
@@ -187,18 +189,95 @@ Both are names from `palette-spec'; AGAINST defaults to `base'."
   (let ((against (or against 'base)))
     (dolist (spec kamakura/palette-spec)
       (let* ((name (car spec))
-             (ratio (kamakura/contrast name against)))
+             (ratio (kamakura/wcag-contrast name against)))
         (message "%-14s %.2f:1  (AA text %s, AA large-text/UI %s)"
                  name ratio
                  (if (>= ratio 4.5) "pass" "fail")
                  (if (>= ratio 3.0) "pass" "fail"))))))
+
+(defun kamakura/apca-relative-luminance (hex)
+  "Return the APCA Y luminance of HEX (a \"#rrggbb\" string), in [0, 1]."
+  (cl-flet ((linearize (v)
+              (let ((c (/ v 255.0)))
+                (expt c 2.4))))
+    (+ (* 0.2126729 (linearize (string-to-number (substring hex 1 3) 16)))
+       (* 0.7151522 (linearize (string-to-number (substring hex 3 5) 16)))
+       (* 0.0721750 (linearize (string-to-number (substring hex 5 7) 16))))))
+
+(defun kamakura/apca-contrast-ratio (text-hex bg-hex)
+  "Return the APCA Lightness Contrast (Lc) value between TEXT-HEX and BG-HEX.
+Unlike WCAG 2.x, APCA is polarity-dependent (text vs background)."
+  (let* ((y-text (kamakura/apca-relative-luminance text-hex))
+         (y-bg (kamakura/apca-relative-luminance bg-hex))
+         ;; Constants for APCA 0.98G
+         (blk-thrs 0.022)
+         (blk-clmp 1.414)
+         (scale-bo 1.14)
+         (lo-clip 0.1)
+         (delta-y-min 0.0005)
+
+         ;; clamping/black level adjustments
+         (y-text-c (if (< y-text blk-thrs)
+                       (+ y-text (expt (- blk-thrs y-text) blk-clmp))
+                     y-text))
+         (y-bg-c (if (< y-bg blk-thrs)
+                     (+ y-bg (expt (- blk-thrs y-bg) blk-clmp))
+                   y-bg))
+         
+         (lc 0.0))
+    
+    ;; check polarity and calculate Lc
+    (cond
+     ;; black text on white background (or dark-on-light)
+     ((> y-bg-c y-text-c)
+      (let ((output (* (- (expt y-bg-c 0.56) (expt y-text-c 0.57)) scale-bo)))
+        (setq lc (if (< (abs output) lo-clip) 0.0 (* output 100.0)))))
+     
+     ;; white text on black background (or light-on-dark)
+     (t
+      (let ((output (* (- (expt y-bg-c 0.65) (expt y-text-c 0.62)) scale-bo)))
+        (setq lc (if (< (abs output) lo-clip) 0.0 (* output 100.0))))))
+    
+    lc))
+
+(defun kamakura/apca-contrast (name &optional against)
+  "Report the APCA contrast (Lc) of palette color NAME against AGAINST.
+Both are names from 'palette-spec'; AGAINST defaults to 'base'."
+  (interactive
+   (let ((names (mapcar #'car kamakura/palette-spec)))
+     (list (intern (completing-read "Color: " names))
+           (intern (completing-read "Against (default base): " names nil nil nil nil "base")))))
+  (let* ((against (or against 'base))
+         (text-hex (alist-get name kamakura/palette))
+         (bg-hex (alist-get against kamakura/palette))
+         (lc (kamakura/apca-contrast-ratio text-hex bg-hex)))
+    (when (called-interactively-p 'any)
+      (message "%s vs %s: Lc %.1f  (Absolute contrast: %.1f)"
+               name against lc (abs lc)))
+    lc))
+
+(defun kamakura/apca-audit-contrast (&optional against)
+  "Print the APCA contrast (Lc) of every palette color against AGAINST.
+AGAINST defaults to 'base'.
+
+Suggested ranges:
+https://git.apcacontrast.com/documentation/APCA_in_a_Nutshell#use-case--size-ranges"
+  (interactive
+   (list (intern (completing-read "Against (default base): "
+                                  (mapcar #'car kamakura/palette-spec)
+                                  nil nil nil nil "base"))))
+  (let ((against (or against 'base)))
+    (dolist (spec kamakura/palette-spec)
+      (let* ((name (car spec))
+             (lc (kamakura/apca-contrast name against)))
+        (message "%-14s Lc %.1f" name lc)))))
 
 (deftheme kamakura "Nanbokuchou theme.")
 
 (kamakura/with-palette
   (custom-theme-set-faces
    'kamakura
-   ;; --- core ui -------------------------------------------------
+   ;; --- core ui -------------------------------------------------------
    `(default ((t (:background ,base :foreground ,text))))
    `(cursor ((t (:background ,text))))
    `(region ((t (:background ,ayako :foreground ,base))))
@@ -222,12 +301,12 @@ Both are names from `palette-spec'; AGAINST defaults to `base'."
    `(fill-column-indicator ((t (:foreground ,high))))
    `(bookmark-face ((t (:foreground ,tokiyuki))))
 
-   ;; --- errors / warnings / success ------------------------------
+   ;; --- errors / warnings / success -----------------------------------
    `(error ((t (:foreground ,miko :weight bold))))
    `(warning ((t (:foreground ,mima :weight bold))))
    `(success ((t (:foreground ,yorishige :weight bold))))
 
-   ;; --- mode-line / header / tab lines ---------------------------
+   ;; --- mode-line / header / tab lines --------------------------------
    `(mode-line ((t (:background ,surface :foreground ,text))))
    `(mode-line-inactive ((t (:background ,base :foreground ,muted))))
    `(mode-line-active ((t (:background ,surface :foreground ,text))))
@@ -686,7 +765,7 @@ STRIP-HASH optionally removes # from templates that require bare rrggbb."
     ))
 
 (defun kamakura/export-all ()
-  "Render every template in `export-targets' against `palette'.
+  "Render every template in 'export-targets' against 'palette'.
 Callable interactively after `load-theme`, or headless via:
   `emacs --batch -l kamakura-theme.el -f kamakura/export-all`."
   (interactive)
