@@ -11,6 +11,7 @@
 ;;; Code:
 
 (require 'color)
+(require 'cl-lib)
 
 (defvar kamakura/theme-dir
   (file-name-directory (or load-file-name buffer-file-name default-directory))
@@ -69,38 +70,39 @@ DH, DS and DL are optional deltas added to H, S and L before conversion."
                        (expt (- b gray-val) 2))))
     (number-to-string (if (<= cube-dist gray-dist) cube-idx (+ 232 gray-idx)))))
 
-(defconst kamakura/palette-spec
-  '(;; backgrounds
-    (base    45 0.71 0.93)
-    (surface 46 0.76 0.90)
-    (overlay 40 0.82 0.87)
+(eval-and-compile
+  (defconst kamakura/palette-spec
+    '(;; backgrounds
+      (base    45 0.71 0.93)
+      (surface 46 0.76 0.90)
+      (overlay 40 0.82 0.87)
 
-    ;; foregrounds
-    (muted 35 0.16 0.60)
-    (faint 35 0.12 0.48)
-    (text  30 0.22 0.30)
-    (light 30 0.28 0.20)
+      ;; foregrounds
+      (muted 35 0.16 0.60)
+      (faint 35 0.12 0.48)
+      (text  30 0.22 0.30)
+      (light 30 0.28 0.20)
 
-    ;; contrast
-    (low  44 0.30 0.90)
-    (med  39 0.25 0.82)
-    (high 44 0.45 0.72)
+      ;; contrast
+      (low  44 0.30 0.90)
+      (med  39 0.25 0.82)
+      (high 44 0.45 0.72)
 
-    ;; accents
-    (miko      352 0.76 0.38)   ; red
-    (yorishige 114 0.50 0.36)   ; green
-    (mima      44  0.75 0.46)   ; gold
-    (tokiyuki  263 0.33 0.61)   ; purple
-    (ayako     355 0.63 0.65)   ; pink
-    (shizuku   186 0.53 0.35)   ; turquoise
+      ;; accents
+      (miko      352 0.76 0.38)   ; red
+      (yorishige 114 0.50 0.36)   ; green
+      (mima      44  0.75 0.46)   ; gold
+      (tokiyuki  263 0.33 0.61)   ; purple
+      (ayako     355 0.63 0.65)   ; pink
+      (shizuku   186 0.53 0.35)   ; turquoise
 
-    ;; terminal alt
-    (taisha    miko      0.0  0.8  -0.1)
-    (suwa      yorishige 0.0  0.4  -0.1)
-    (sasaki    mima      0.0  0.1  -0.1)
-    (hojo      tokiyuki  0.0 -0.1  -0.1)
-    (mochizuki ayako     0.0 -0.1  -0.1)
-    (kami      shizuku   0.0  0.6  -0.1)))
+      ;; terminal alt
+      (taisha    miko      0.0  0.8  -0.1)
+      (suwa      yorishige 0.0  0.4  -0.1)
+      (sasaki    mima      0.0  0.1  -0.1)
+      (hojo      tokiyuki  0.0 -0.1  -0.1)
+      (mochizuki ayako     0.0 -0.1  -0.1)
+      (kami      shizuku   0.0  0.6  -0.1))))
 
 (defun kamakura/build-palette ()
   "Derive the full hex palette from 'palette-spec'.
