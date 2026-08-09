@@ -1,0 +1,56 @@
+{
+    "light": {
+        "palette": {
+            "AlternateBase": "{{surface}}",
+            "Base": "{{overlay}}",
+            "BrightText": "{{light}}",
+            "BrightText-disabled": "{{light}}",
+            "Button": "{{surface}}",
+            "ButtonText": "{{text}}",
+            "ButtonText-disabled": "{{faint}}",
+            "Highlight": "{{ayako}}",
+            "HighlightedText": "{{base}}",
+            "HighlightedText-disabled": "{{muted}}",
+            "Link": "{{tokiyuki}}",
+            "LinkVisited": "{{mima}}",
+            "PlaceholderText": "{{text}}",
+            "PlaceholderText-disabled": "{{text}}",
+            "Text": "{{text}}",
+            "Text-disabled": "{{faint}}",
+            "ToolTipBase": "{{overlay}}",
+            "ToolTipText": "{{text}}",
+            "ToolTipText-disabled": "{{text}}",
+            "Window": "{{base}}",
+            "WindowText": "{{text}}",
+            "WindowText-disabled": "{{faint}}"
+        },
+        "use_custom": true
+    },
+    "dark": {
+        "palette": {
+            "AlternateBase": "{{surface}}",
+            "Base": "{{overlay}}",
+            "BrightText": "{{light}}",
+            "BrightText-disabled": "{{light}}",
+            "Button": "{{surface}}",
+            "ButtonText": "{{text}}",
+            "ButtonText-disabled": "{{faint}}",
+            "Highlight": "{{ayako}}",
+            "HighlightedText": "{{base}}",
+            "HighlightedText-disabled": "{{muted}}",
+            "Link": "{{tokiyuki}}",
+            "LinkVisited": "{{mima}}",
+            "PlaceholderText": "{{text}}",
+            "PlaceholderText-disabled": "{{text}}",
+            "Text": "{{text}}",
+            "Text-disabled": "{{faint}}",
+            "ToolTipBase": "{{overlay}}",
+            "ToolTipText": "{{text}}",
+            "ToolTipText-disabled": "{{text}}",
+            "Window": "{{base}}",
+            "WindowText": "{{text}}",
+            "WindowText-disabled": "{{faint}}"
+        },
+        "use_custom": true
+    }
+}

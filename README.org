@@ -44,6 +44,7 @@ or
 
 ** extras
 
+- [[https://calibre-ebook.com/][calibre]]
 - [[https://codeberg.org/dnkl/foot][foot]]
 - [[https://neovim.io][nvim]] 0.11
 - shell
